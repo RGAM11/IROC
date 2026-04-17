@@ -214,6 +214,45 @@ const isToday = (d) => { const t=new Date(); return d.getDate()===t.getDate() &&
 
 const CREST_URL = "/emory-crest.png";
 
+// Zoomable image component (pinch + buttons)
+function ZoomImage({ src, alt, color, T }) {
+  const [scale, setScale] = useState(1);
+  const [pos, setPos] = useState({x:0,y:0});
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({x:0,y:0});
+  const [lastDist, setLastDist] = useState(null);
+  const dist = (t) => Math.sqrt((t[0].clientX-t[1].clientX)**2 + (t[0].clientY-t[1].clientY)**2);
+  const onTS = (e) => {
+    if (e.touches.length===2) { e.preventDefault(); setLastDist(dist(e.touches)); }
+    else if (e.touches.length===1 && scale>1) { setDragging(true); setDragStart({x:e.touches[0].clientX-pos.x,y:e.touches[0].clientY-pos.y}); }
+  };
+  const onTM = (e) => {
+    if (e.touches.length===2 && lastDist) {
+      e.preventDefault(); const nd=dist(e.touches); const ns=Math.min(5,Math.max(1,scale*(nd/lastDist)));
+      setScale(ns); setLastDist(nd); if(ns<=1) setPos({x:0,y:0});
+    } else if (e.touches.length===1 && dragging && scale>1) {
+      setPos({x:e.touches[0].clientX-dragStart.x,y:e.touches[0].clientY-dragStart.y});
+    }
+  };
+  const onTE = () => { setDragging(false); setLastDist(null); };
+  const reset = () => { setScale(1); setPos({x:0,y:0}); };
+  return (
+    <div style={{ marginTop:"10px" }}>
+      <div style={{ overflow:"hidden", borderRadius:"8px", border:`1px solid ${T.cardBorder}`, touchAction:scale>1?"none":"auto" }}
+        onTouchStart={onTS} onTouchMove={onTM} onTouchEnd={onTE}>
+        <img src={src} alt={alt} style={{ width:"100%", display:"block",
+          transform:`scale(${scale}) translate(${pos.x/scale}px,${pos.y/scale}px)`,
+          transformOrigin:"center", transition:dragging?"none":"transform 0.15s" }} />
+      </div>
+      <div style={{ display:"flex", gap:"6px", marginTop:"6px", justifyContent:"center" }}>
+        <div onClick={()=>setScale(s=>Math.min(5,s+0.5))} style={{ padding:"6px 14px", borderRadius:"6px", background:color, color:"#fff", fontSize:"14px", fontWeight:700, cursor:"pointer" }}>＋</div>
+        <div onClick={()=>{const ns=Math.max(1,scale-0.5); setScale(ns); if(ns<=1) setPos({x:0,y:0});}} style={{ padding:"6px 14px", borderRadius:"6px", background:color, color:"#fff", fontSize:"14px", fontWeight:700, cursor:"pointer" }}>－</div>
+        {scale>1 && <div onClick={reset} style={{ padding:"6px 14px", borderRadius:"6px", background:T.roleBg, border:`1px solid ${T.roleBorder}`, color:T.roleText, fontSize:"12px", fontWeight:700, cursor:"pointer" }}>Reset</div>}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [schedule, setSchedule] = useState(null);
   const [selectedHospital, setSelectedHospital] = useState(null);
@@ -469,11 +508,7 @@ export default function App() {
               ) : !activeRole.image ? <div style={{ color:T.textMuted, fontSize:"13px" }}>No number assigned</div> : null}
               {/* #3 Notes: 14px, no italic */}
               {activeRole.note && <div style={{ fontSize:"14px", color: dk ? "#D4A84A" : "#8A6D2A", marginTop:"8px" }}>⚠️ {activeRole.note}</div>}
-              {activeRole.image && (
-                <div style={{ marginTop:"10px" }}>
-                  <img src={activeRole.image} alt={activeRole.label} style={{ width:"100%", borderRadius:"8px", border:`1px solid ${T.cardBorder}` }} />
-                </div>
-              )}
+              {activeRole.image && <ZoomImage src={activeRole.image} alt={activeRole.label} color={hospital.color} T={T} />}
               {activeRole.link && (
                 <a href={activeRole.link} target="_blank" rel="noopener noreferrer" style={{
                   display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"8px",
