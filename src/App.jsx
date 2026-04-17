@@ -35,6 +35,7 @@ const HOSPITAL_ROLES = {
     { key:"SecondTech",  label:"2nd IR Tech",       icon:"🔧", row:2, tint:"#EEF5F1" },
     { key:"CTTech",      label:"CT Tech",           icon:"🖥️", row:3, static:true, phone:"" },
     { key:"Anesthesia",  label:"Anesthesia",        icon:"💉", row:3, static:true, phone:"404-712-7283", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
+    { key:"EUH_Schedule", label:"Emailed Schedule", icon:"📋", row:4, static:true, phone:"", image:"/euh-schedule.png" },
   ],
   2: [
     { key:"IR",               label:"IR",                  icon:"🩺", row:0 },
@@ -57,8 +58,8 @@ const HOSPITAL_ROLES = {
   ],
   5: [
     { key:"IR",         label:"IR",            icon:"🩺", row:0 },
-    { key:"OCC",        label:"On-Call Coordinator",  icon:"📞", row:0, static:true, phone:"404-491-5493", note:"The On-Call Coordinator (OCC) manages staffing and coordinates on-call coverage for the hospital." },
-    { key:"POS",        label:"Point of Service",     icon:"📞", row:0, static:true, phone:"404-778-8298", note:"The Point of Service (POS) is the central nursing contact for patient-related inquiries and bed management." },
+    { key:"OCC",        label:"On-Call Coordinator",  icon:"📞", row:0, static:true, phone:"404-491-5493", note:"OCC will help call in IR Tech & RN as well as anesthesia if needed" },
+    { key:"POS",        label:"Point of Service",     icon:"📞", row:0, static:true, phone:"404-778-8298", note:"POS will help post your case, inform POS if anesthesia assistance will be needed" },
     { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641" },
     { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:1, static:true, phone:"470-990-1356", note:"Check EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"Operator",   label:"EJCH Operator", icon:"📞", row:1, static:true, phone:"678-474-7000" },
@@ -465,9 +466,14 @@ export default function App() {
                     <PhoneButtons phone={activeRole.phone2} clr={hospital.color} />
                   </>}
                 </>
-              ) : <div style={{ color:T.textMuted, fontSize:"13px" }}>No number assigned</div>}
+              ) : !activeRole.image ? <div style={{ color:T.textMuted, fontSize:"13px" }}>No number assigned</div> : null}
               {/* #3 Notes: 14px, no italic */}
               {activeRole.note && <div style={{ fontSize:"14px", color: dk ? "#D4A84A" : "#8A6D2A", marginTop:"8px" }}>⚠️ {activeRole.note}</div>}
+              {activeRole.image && (
+                <div style={{ marginTop:"10px" }}>
+                  <img src={activeRole.image} alt={activeRole.label} style={{ width:"100%", borderRadius:"8px", border:`1px solid ${T.cardBorder}` }} />
+                </div>
+              )}
               {activeRole.link && (
                 <a href={activeRole.link} target="_blank" rel="noopener noreferrer" style={{
                   display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"8px",
