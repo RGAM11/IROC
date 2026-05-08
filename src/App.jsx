@@ -145,14 +145,15 @@ const parseEUHTab = (text, data) => {
         data[id].IHTech[day] = { name:"Weekend Only", phone:"", time:"" };
       }
       // Primary Tech
+      const isFri = day === "Friday";
       if (isWE) {
         const dn=c(r,22), dp=c(r,23), nn=c(r,24), np=c(r,25);
         data[id].PrimaryTech[day] = { name:dn||nn||"N/A", phone:dp||np||"", time:dn?"7:00 AM – 7:00 PM":"7:00 PM – 7:00 AM",
           ...(dn && nn ? { name2:nn, phone2:np, time2:"7:00 PM – 7:00 AM" } : {}) };
       } else {
-        data[id].PrimaryTech[day] = { name:c(r,24)||"N/A", phone:c(r,25)||"", time:c(r,24)?"7:00 PM – 7:00 AM":"" };
+        data[id].PrimaryTech[day] = { name:c(r,24)||"N/A", phone:c(r,25)||"", time:c(r,24)?(isFri?"3:00 PM – 7:00 AM":"7:00 PM – 7:00 AM"):"" };
       }
-      data[id].SecondTech[day] = { name:c(r,26)||"N/A", phone:c(r,27)||"", time:c(r,26)?"7:00 PM – 7:00 AM":"" };
+      data[id].SecondTech[day] = { name:c(r,26)||"N/A", phone:c(r,27)||"", time:c(r,26)?(isFri?"5:30 PM – 7:00 AM":"7:00 PM – 7:00 AM"):"" };
     }
   });
 };
@@ -166,8 +167,25 @@ const parseMidTab = (text, data) => {
     data[id].IR[day] = { name:c(r,2), phone:c(r,3), time: isWE ? "All Day" : "5:00 PM – 7:00 AM" };
     if (id === 6) {
       data[id].Resident[day] = { name:c(r,4)||"N/A", phone:c(r,5)||"", time: isWE ? "All Day" : "5:00 PM – 7:00 AM" };
-      data[id].Technologist[day] = { name:c(r,6)||"N/A", phone:c(r,7)||"", time:"On Call" };
-      data[id].RN[day] = { name:c(r,8)||"N/A", phone:c(r,9)||"", time:"On Call" };
+      // Tech and RN — handle split shifts like "Eric 7a-3p/Kimmie 3p-7a"
+      const techRaw = c(r,6), techPhone = c(r,7), rnRaw = c(r,8), rnPhone = c(r,9);
+      // Parse potential split: "Name1/Name2" or "Name1 7a-3p/Name2 3p-7a"
+      const parseSplit = (raw, phone) => {
+        if (!raw) return { name:"N/A", phone:"", time:"On Call" };
+        if (raw.includes("/")) {
+          const parts = raw.split("/").map(s => s.trim());
+          // Try to extract time from each part e.g. "Eric 7a-3p"
+          const parseNameTime = (s) => {
+            const m = s.match(/^(.+?)\s+(\d+[ap]?m?\s*-\s*\d+[ap]?m?)$/i);
+            return m ? { name: m[1].trim(), time: m[2].trim() } : { name: s, time: "On Call" };
+          };
+          const p1 = parseNameTime(parts[0]), p2 = parseNameTime(parts[1]);
+          return { name: p1.name, phone: phone, time: p1.time, name2: p2.name, phone2: "", time2: p2.time };
+        }
+        return { name: raw, phone: phone, time: "On Call" };
+      };
+      data[id].Technologist[day] = parseSplit(techRaw, techPhone);
+      data[id].RN[day] = parseSplit(rnRaw, rnPhone);
     }
     if (id === 4) {
       data[id].Technologist[day] = { name:c(r,6)||"N/A", phone:c(r,7)||"", time:"On Call" };
