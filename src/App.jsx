@@ -67,8 +67,8 @@ const HOSPITAL_ROLES = {
   6: [
     { key:"IR",          label:"IR",         icon:"🩺", row:0 },
     { key:"Resident",    label:"Resident",   icon:"🙃", row:0 },
-    { key:"Technologist",label:"IR Tech",    icon:"🔧", row:1, weekendOnly:true },
-    { key:"RN",          label:"RN",         icon:"🩹", row:1, weekendOnly:true },
+    { key:"Technologist",label:"IR Tech",    icon:"🔧", row:1, friWeekend:true },
+    { key:"RN",          label:"RN",         icon:"🩹", row:1, friWeekend:true },
     { key:"RadFrontDesk",label:"Radiology Front Desk", icon:"📞", row:1, static:true, phone:"404-686-5998", note:"Call to find out the on-call RN and IR Tech" },
     { key:"CTTech",      label:"CT Tech",    icon:"🖥️", row:2, static:true, phone:"" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"", note:"Check on EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
@@ -96,16 +96,14 @@ const parseCSVRows = (text) => {
     result.push(cur.trim()); return result;
   });
 };
+const clean = (s) => (s || "").replace(/[\u200B-\u200D\uFEFF\u00A0]/g, "").trim();
 const getDataRows = (allRows) => {
-  const hi = allRows.findIndex(r => r[0] && r[0].trim() === "HOSP");
-  if (hi === -1) return [];
-  // Try hi+1 first — if it looks like data (starts with a hospital name), use it
-  // Otherwise skip one sub-header row (hi+2)
-  const nextRow = allRows[hi + 1];
-  const skip = (nextRow && HOSP_ID[nextRow[0]?.trim()]) ? 1 : 2;
-  return allRows.slice(hi + skip).filter(r => r[0] && r[0].trim() !== "");
+  return allRows.filter(r => {
+    const h = clean(r[0]);
+    return h && HOSP_ID[h];
+  });
 };
-const c = (r, i) => (r[i] || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+const c = (r, i) => clean(r[i]);
 
 // EUH-EHH-EDH: 28 cols. IH RN cols 6-11, IH Tech cols 18-21 (weekend only)
 const parseEUHTab = (text, data) => {
@@ -160,7 +158,7 @@ const parseEUHTab = (text, data) => {
 
 const parseMidTab = (text, data) => {
   getDataRows(parseCSVRows(text)).forEach(r => {
-    const rawHosp = c(r,0).replace("MTWEM","MT/WEM");
+    const rawHosp = clean(r[0]).replace("MTWEM","MT/WEM");
     const id = HOSP_ID[rawHosp]; const day = c(r,1);
     if (!id || !day || !data[id]) return;
     const isWE = day === "Saturday" || day === "Sunday";
@@ -420,7 +418,12 @@ export default function App() {
   const selDate = weekDates[selDayIdx >= 0 ? selDayIdx : 0];
   const isTodaySel = selectedDay === todayName;
   const isWeekendDay = selectedDay === "Saturday" || selectedDay === "Sunday";
-  const visibleRoles = roles.filter(r => !r.weekendOnly || isWeekendDay);
+  const isFriWeekend = selectedDay === "Friday" || isWeekendDay;
+  const visibleRoles = roles.filter(r => {
+    if (r.weekendOnly) return isWeekendDay;
+    if (r.friWeekend) return isFriWeekend;
+    return true;
+  });
   // If selected role is hidden (weekendOnly on weekday), switch to first visible
   const effectiveRole = visibleRoles.find(r => r.key === selectedRole) ? selectedRole : (visibleRoles[0]?.key || null);
   const activeRole = visibleRoles.find(r => r.key === effectiveRole);
