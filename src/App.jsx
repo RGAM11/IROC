@@ -27,10 +27,10 @@ const HOSPITAL_ROLES = {
   1: [
     { key:"IR",          label:"IR",              icon:"🩺", row:0 },
     { key:"Resident",    label:"Resident",        icon:"🙃", row:0 },
-    { key:"IHRN",        label:"IH RN",           icon:"🩹", row:1, tint:"#ECF3F8", weekendOnly:true },
+    { key:"IHRN",        label:"In-House RN",      icon:"🩹", row:1, tint:"#ECF3F8", weekendOnly:true },
     { key:"PrimaryRN",   label:"Primary RN",      icon:"🩹", row:1, tint:"#ECF3F8" },
     { key:"SecondRN",    label:"2nd RN",           icon:"🩹", row:1, tint:"#ECF3F8" },
-    { key:"IHTech",      label:"IH Tech",          icon:"🔧", row:2, tint:"#EEF5F1", weekendOnly:true },
+    { key:"IHTech",      label:"In-House Tech",    icon:"🔧", row:2, tint:"#EEF5F1", weekendOnly:true },
     { key:"PrimaryTech", label:"Primary IR Tech",  icon:"🔧", row:2, tint:"#EEF5F1" },
     { key:"SecondTech",  label:"2nd IR Tech",       icon:"🔧", row:2, tint:"#EEF5F1" },
     { key:"CTTech",      label:"CT Tech",           icon:"🖥️", row:3, static:true, phone:"" },
@@ -358,15 +358,15 @@ export default function App() {
             <div style={{ paddingTop:"76px", textAlign:"center", position:"relative", zIndex:1 }}>
               <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
               <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
-                <span style={{ color: dk ? "#6A9FD0" : "#9CC5E0" }}>I</span>
-                <span style={{ color: dk ? "#4A85C0" : "#6EA3C8" }}>R</span>
-                <span style={{ color: dk ? "#3068A8" : "#4A7EA0" }}>O</span>
-                <span style={{ color: dk ? "#8BADE0" : "#1E3A5F" }}>C</span>
+                <span style={{ color: dk ? "#6A8FBF" : "#7BA3C9" }}>I</span>
+                <span style={{ color: dk ? "#4A75A8" : "#4A6FA0" }}>R</span>
+                <span style={{ color: dk ? "#2E5A8A" : "#2B4A7A" }}>O</span>
+                <span style={{ color: dk ? "#7A9FC0" : "#112240" }}>C</span>
               </div>
               <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:"4px", marginTop:"4px" }}>
-                <div style={{ width:"28px", height:"4px", borderRadius:"2px", background: dk ? "#3068A8" : "#4A7EA0" }} />
-                <div style={{ width:"8px", height:"4px", borderRadius:"2px", background: dk ? "#4A85C0" : "#6EA3C8" }} />
-                <div style={{ width:"5px", height:"4px", borderRadius:"2px", background: dk ? "#6A9FD0" : "#9CC5E0" }} />
+                <div style={{ width:"28px", height:"4px", borderRadius:"2px", background: dk ? "#2E5A8A" : "#2B4A7A" }} />
+                <div style={{ width:"8px", height:"4px", borderRadius:"2px", background: dk ? "#4A75A8" : "#4A6FA0" }} />
+                <div style={{ width:"5px", height:"4px", borderRadius:"2px", background: dk ? "#6A8FBF" : "#7BA3C9" }} />
               </div>
             </div>
           </div>
@@ -384,12 +384,12 @@ export default function App() {
                 <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
+                  background:"linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
                 }}><span>🔗</span> EHConnect</a>
                 <a href="https://www.emoryhealthcare.org/-/media/Project/EH/Emory/ui/pdfs/ejch-physician-forms/2018-Consent-to-Medical-or-Surgical-Treatment.pdf" target="_blank" rel="noopener noreferrer" style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #C5DDE9 0%, #9CC5E0 100%)", color:"#2A4A5F", fontWeight:700, fontSize:"13px",
+                  background:"linear-gradient(135deg, #B0C8D9 0%, #7BA3C9 100%)", color:"#1A2A3F", fontWeight:700, fontSize:"13px",
                 }}><span>📄</span> Blank Consent</a>
               </div>
             </div>
@@ -398,12 +398,12 @@ export default function App() {
               <div onClick={()=>setTheme("light")} style={{
                 padding:"10px 24px", borderRadius:"10px", cursor:"pointer", fontWeight:700, fontSize:"12px",
                 background: !dk ? "#fff" : "transparent", color: !dk ? "#1E293B" : T.textMuted,
-                border:`2px solid ${!dk ? "#4A7EA0" : T.cardBorder}`,
+                border:`2px solid ${!dk ? "#2B4A7A" : T.cardBorder}`,
               }}>☀️ Light</div>
               <div onClick={()=>setTheme("dark")} style={{
                 padding:"10px 24px", borderRadius:"10px", cursor:"pointer", fontWeight:700, fontSize:"12px",
                 background: dk ? "#1A2332" : "transparent", color: dk ? "#E2E8F0" : T.textMuted,
-                border:`2px solid ${dk ? "#6EA3C8" : T.cardBorder}`,
+                border:`2px solid ${dk ? "#4A6FA0" : T.cardBorder}`,
               }}>🌙 Dark</div>
             </div>
             <div style={{ height:"30px" }} />
@@ -515,7 +515,7 @@ export default function App() {
         <div style={{ marginBottom:"14px" }}>
           <div style={{ fontSize:"13px", fontWeight:700, color:T.text, marginBottom:"6px" }}>
             On-Call — {selectedDay}, {fmtDate(selDate)}
-            {isTodaySel && <span style={{ marginLeft:"8px", background:"#3DA07A", color:"#fff", fontSize:"9px", fontWeight:700, padding:"2px 7px", borderRadius:"10px" }}>TODAY</span>}
+            {isTodaySel && <span style={{ marginLeft:"8px", background:"#2B6B5E", color:"#fff", fontSize:"9px", fontWeight:700, padding:"2px 7px", borderRadius:"10px" }}>TODAY</span>}
           </div>
 
           {activeRole?.static ? (
@@ -540,7 +540,7 @@ export default function App() {
                 <a href={activeRole.link} target="_blank" rel="noopener noreferrer" style={{
                   display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"8px",
                   padding:"8px 16px", borderRadius:"8px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                  background:"linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
                 }}>🔗 {activeRole.linkLabel || "Open Link"}</a>
               )}
             </div>
@@ -597,11 +597,11 @@ export default function App() {
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
                 <a href={`sms:${[td,rd].filter(Boolean).join(",")}`} style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px", padding:"12px", borderRadius:"10px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #3DA07A 0%, #2E8A6A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                  background:"linear-gradient(135deg, #2B6B5E 0%, #1E5A4A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
                 }}>💬 Group Text</a>
                 <a href={`tel:${td || rd},${rd || td}`} style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px", padding:"12px", borderRadius:"10px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #4A7EA0 0%, #3D6D8A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                  background:"linear-gradient(135deg, #2B4A7A 0%, #1B3A5C 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
                 }}>📞 Group Call</a>
               </div>
               <div style={{ fontSize:"10px", color:T.textMuted, textAlign:"center", marginTop:"4px" }}>
