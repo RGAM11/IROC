@@ -58,7 +58,7 @@ const HOSPITAL_ROLES = {
   ],
   5: [
     { key:"IR",         label:"IR",            icon:"🩺", row:0 },
-    { key:"OCC",        label:"On-Call Coordinator",  icon:"📞", row:0, static:true, phone:"404-491-5493", note:"OCC will help call in IR Tech & RN as well as anesthesia if needed" },
+    { key:"OCC",        label:"On Call Coordinator / Nursing Supervisor",  icon:"📞", row:0, static:true, phone:"404-491-5493", note:"OCC will help call in IR Tech & RN as well as anesthesia if needed.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed" },
     { key:"POS",        label:"Point of Service",     icon:"📞", row:0, static:true, phone:"404-778-8298", note:"POS will help post your case, inform POS if anesthesia assistance will be needed" },
     { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641" },
     { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:1, static:true, phone:"470-990-1356", note:"Check EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
@@ -534,7 +534,7 @@ export default function App() {
                 </>
               ) : !activeRole.image ? <div style={{ color:T.textMuted, fontSize:"13px" }}>No number assigned</div> : null}
               {/* #3 Notes: 14px, no italic */}
-              {activeRole.note && <div style={{ fontSize:"14px", color: dk ? "#D4A84A" : "#8A6D2A", marginTop:"8px" }}>⚠️ {activeRole.note}</div>}
+              {activeRole.note && <div style={{ fontSize:"14px", color: dk ? "#D4A84A" : "#8A6D2A", marginTop:"8px", whiteSpace:"pre-line" }}>⚠️ {activeRole.note}</div>}
               {activeRole.image && <ZoomImage src={activeRole.image} alt={activeRole.label} color={hospital.color} T={T} />}
               {activeRole.link && (
                 <a href={activeRole.link} target="_blank" rel="noopener noreferrer" style={{
@@ -586,7 +586,7 @@ export default function App() {
           )}
         </div>
 
-        {/* Group Text */}
+        {/* Group Text & Call */}
         {[4,6,7].includes(selectedHospital) && (effectiveRole === "Technologist" || effectiveRole === "RN") && (() => {
           const te = getEntry(selectedHospital, "Technologist", selectedDay);
           const re = getEntry(selectedHospital, "RN", selectedDay);
@@ -594,10 +594,16 @@ export default function App() {
           if (!td && !rd) return null;
           return (
             <div style={{ marginBottom:"14px" }}>
-              <a href={`sms:${[td,rd].filter(Boolean).join(",")}`} style={{
-                display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", padding:"12px", borderRadius:"10px", textDecoration:"none",
-                background:"linear-gradient(135deg, #3DA07A 0%, #2E8A6A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
-              }}>💬 Group Text IR Tech & RN</a>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
+                <a href={`sms:${[td,rd].filter(Boolean).join(",")}`} style={{
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px", padding:"12px", borderRadius:"10px", textDecoration:"none",
+                  background:"linear-gradient(135deg, #3DA07A 0%, #2E8A6A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                }}>💬 Group Text</a>
+                <a href={`tel:${td || rd},${rd || td}`} style={{
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px", padding:"12px", borderRadius:"10px", textDecoration:"none",
+                  background:"linear-gradient(135deg, #4A7EA0 0%, #3D6D8A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                }}>📞 Group Call</a>
+              </div>
               <div style={{ fontSize:"10px", color:T.textMuted, textAlign:"center", marginTop:"4px" }}>
                 {te?.name && te.name !== "N/A" ? te.name : "Tech"} + {re?.name && re.name !== "N/A" ? re.name : "RN"}
               </div>
