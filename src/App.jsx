@@ -27,12 +27,12 @@ const HOSPITAL_ROLES = {
   1: [
     { key:"IR",          label:"IR",              icon:"🩺", row:0 },
     { key:"Resident",    label:"Resident",        icon:"🙃", row:0 },
-    { key:"IHRN",        label:"In-House RN",      icon:"🩹", row:1, tint:"#ECF3F8", weekendOnly:true },
+    { key:"IHRN",        label:"In-House RN",           icon:"🩹", row:1, tint:"#ECF3F8", weekendOnly:true },
     { key:"PrimaryRN",   label:"Primary RN",      icon:"🩹", row:1, tint:"#ECF3F8" },
-    { key:"SecondRN",    label:"2nd RN",           icon:"🩹", row:1, tint:"#ECF3F8" },
-    { key:"IHTech",      label:"In-House Tech",    icon:"🔧", row:2, tint:"#EEF5F1", weekendOnly:true },
+    { key:"SecondRN",    label:"2nd RN",           icon:"🩹", row:1, tint:"#ECF3F8", weekdayLink:"https://ehconnect.eushc.org/", weekdayLinkLabel:"Open EHConnect" },
+    { key:"IHTech",      label:"In-House Tech",          icon:"🔧", row:2, tint:"#EEF5F1", weekendOnly:true },
     { key:"PrimaryTech", label:"Primary IR Tech",  icon:"🔧", row:2, tint:"#EEF5F1" },
-    { key:"SecondTech",  label:"2nd IR Tech",       icon:"🔧", row:2, tint:"#EEF5F1" },
+    { key:"SecondTech",  label:"2nd IR Tech",       icon:"🔧", row:2, tint:"#EEF5F1", weekdayLink:"https://ehconnect.eushc.org/", weekdayLinkLabel:"Open EHConnect" },
     { key:"CTTech",      label:"CT Tech",           icon:"🖥️", row:3, static:true, phone:"" },
     { key:"Anesthesia",  label:"Anesthesia",        icon:"💉", row:3, static:true, phone:"404-712-7283", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"EUH_Schedule", label:"Emailed Schedule", icon:"📋", row:4, static:true, phone:"", image:"/euh-schedule.png" },
@@ -58,10 +58,10 @@ const HOSPITAL_ROLES = {
   ],
   5: [
     { key:"IR",         label:"IR",            icon:"🩺", row:0 },
-    { key:"OCC",        label:"On Call Coordinator / Nursing Supervisor",  icon:"📞", row:0, static:true, phone:"404-491-5493", note:"OCC will help call in IR Tech & RN as well as anesthesia if needed.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed" },
+    { key:"OCC",        label:"On Call Coordinator / Nursing Supervisor",  icon:"📞", row:0, static:true, phone:"404-491-5493", note:"OCC will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed" },
     { key:"POS",        label:"Point of Service",     icon:"📞", row:0, static:true, phone:"404-778-8298", note:"POS will help post your case, inform POS if anesthesia assistance will be needed" },
     { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641" },
-    { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:1, static:true, phone:"470-990-1356", note:"Check EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
+    { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:1, static:true, phone:"470-990-1356" },
     { key:"Operator",   label:"EJCH Operator", icon:"📞", row:1, static:true, phone:"678-474-7000" },
   ],
   6: [
@@ -165,14 +165,10 @@ const parseMidTab = (text, data) => {
     data[id].IR[day] = { name:c(r,2), phone:c(r,3), time: isWE ? "All Day" : "5:00 PM – 7:00 AM" };
     if (id === 6) {
       data[id].Resident[day] = { name:c(r,4)||"N/A", phone:c(r,5)||"", time: isWE ? "All Day" : "5:00 PM – 7:00 AM" };
-      // Tech and RN — handle split shifts like "Eric 7a-3p/Kimmie 3p-7a"
-      const techRaw = c(r,6), techPhone = c(r,7), rnRaw = c(r,8), rnPhone = c(r,9);
-      // Parse potential split: "Name1/Name2" or "Name1 7a-3p/Name2 3p-7a"
       const parseSplit = (raw, phone) => {
         if (!raw) return { name:"N/A", phone:"", time:"On Call" };
         if (raw.includes("/")) {
           const parts = raw.split("/").map(s => s.trim());
-          // Try to extract time from each part e.g. "Eric 7a-3p"
           const parseNameTime = (s) => {
             const m = s.match(/^(.+?)\s+(\d+[ap]?m?\s*-\s*\d+[ap]?m?)$/i);
             return m ? { name: m[1].trim(), time: m[2].trim() } : { name: s, time: "On Call" };
@@ -182,8 +178,8 @@ const parseMidTab = (text, data) => {
         }
         return { name: raw, phone: phone, time: "On Call" };
       };
-      data[id].Technologist[day] = parseSplit(techRaw, techPhone);
-      data[id].RN[day] = parseSplit(rnRaw, rnPhone);
+      data[id].Technologist[day] = parseSplit(c(r,6), c(r,7));
+      data[id].RN[day] = parseSplit(c(r,8), c(r,9));
     }
     if (id === 4) {
       data[id].Technologist[day] = { name:c(r,6)||"N/A", phone:c(r,7)||"", time:"On Call" };
@@ -285,6 +281,12 @@ export default function App() {
 
   useEffect(() => { fetchSchedule().then(d => setSchedule(d)).finally(() => setLoading(false)); }, []);
 
+  // Update browser status bar color to match selected hospital
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", hospital ? hospital.color : "#3D7A8F");
+  }, [selectedHospital]);
+
   const weekDates = getWeekDates();
   const todayName = getDayName();
   const hospital = HOSPITALS.find(h => h.id === selectedHospital);
@@ -358,15 +360,15 @@ export default function App() {
             <div style={{ paddingTop:"76px", textAlign:"center", position:"relative", zIndex:1 }}>
               <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
               <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
-                <span style={{ color: dk ? "#6A8FBF" : "#7BA3C9" }}>I</span>
-                <span style={{ color: dk ? "#4A75A8" : "#4A6FA0" }}>R</span>
-                <span style={{ color: dk ? "#2E5A8A" : "#2B4A7A" }}>O</span>
-                <span style={{ color: dk ? "#7A9FC0" : "#112240" }}>C</span>
+                <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
+                <span style={{ color: dk ? "#4A85C0" : "#4A6FA0" }}>R</span>
+                <span style={{ color: dk ? "#3068A8" : "#4A7EA0" }}>O</span>
+                <span style={{ color: dk ? "#8BADE0" : "#1E3A5F" }}>C</span>
               </div>
               <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:"4px", marginTop:"4px" }}>
-                <div style={{ width:"28px", height:"4px", borderRadius:"2px", background: dk ? "#2E5A8A" : "#2B4A7A" }} />
-                <div style={{ width:"8px", height:"4px", borderRadius:"2px", background: dk ? "#4A75A8" : "#4A6FA0" }} />
-                <div style={{ width:"5px", height:"4px", borderRadius:"2px", background: dk ? "#6A8FBF" : "#7BA3C9" }} />
+                <div style={{ width:"28px", height:"4px", borderRadius:"2px", background: dk ? "#3068A8" : "#4A7EA0" }} />
+                <div style={{ width:"8px", height:"4px", borderRadius:"2px", background: dk ? "#4A85C0" : "#4A6FA0" }} />
+                <div style={{ width:"5px", height:"4px", borderRadius:"2px", background: dk ? "#6A9FD0" : "#7BA3C9" }} />
               </div>
             </div>
           </div>
@@ -384,12 +386,12 @@ export default function App() {
                 <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
+                  background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
                 }}><span>🔗</span> EHConnect</a>
                 <a href="https://www.emoryhealthcare.org/-/media/Project/EH/Emory/ui/pdfs/ejch-physician-forms/2018-Consent-to-Medical-or-Surgical-Treatment.pdf" target="_blank" rel="noopener noreferrer" style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #B0C8D9 0%, #7BA3C9 100%)", color:"#1A2A3F", fontWeight:700, fontSize:"13px",
+                  background:"linear-gradient(135deg, #C5DDE9 0%, #9CC5E0 100%)", color:"#2A4A5F", fontWeight:700, fontSize:"13px",
                 }}><span>📄</span> Blank Consent</a>
               </div>
             </div>
@@ -398,7 +400,7 @@ export default function App() {
               <div onClick={()=>setTheme("light")} style={{
                 padding:"10px 24px", borderRadius:"10px", cursor:"pointer", fontWeight:700, fontSize:"12px",
                 background: !dk ? "#fff" : "transparent", color: !dk ? "#1E293B" : T.textMuted,
-                border:`2px solid ${!dk ? "#2B4A7A" : T.cardBorder}`,
+                border:`2px solid ${!dk ? "#4A7EA0" : T.cardBorder}`,
               }}>☀️ Light</div>
               <div onClick={()=>setTheme("dark")} style={{
                 padding:"10px 24px", borderRadius:"10px", cursor:"pointer", fontWeight:700, fontSize:"12px",
@@ -511,11 +513,19 @@ export default function App() {
           ))}
         </div>
 
+        {/* EJCH Call Workflow — always visible */}
+        {selectedHospital === 5 && (
+          <div style={{ marginBottom:"12px", padding:"12px 14px", borderRadius:"12px", background: dk ? "#1E2A3A" : "#E6EDF8", border:`2px solid ${dk ? "#3D5A7A" : "#8AA0C0"}` }}>
+            <div style={{ fontSize:"14px", fontWeight:800, color: dk ? "#C0D0E0" : "#1B3A5C", marginBottom:"5px" }}>📋 EJCH Call Workflow</div>
+            <div style={{ fontSize:"13px", color: dk ? "#B0C0D0" : "#2A3A5A", lineHeight:"1.5", whiteSpace:"pre-line" }}>{"1. Call OCC/RN Supervisor — give appropriate info\n2. Call Anesthesia (if needed)\n3. Enter Procedure order\n\nOn-call team (RN/IR Tech) will post case utilizing P.O.S."}</div>
+          </div>
+        )}
+
         {/* On-Call Card */}
         <div style={{ marginBottom:"14px" }}>
           <div style={{ fontSize:"13px", fontWeight:700, color:T.text, marginBottom:"6px" }}>
             On-Call — {selectedDay}, {fmtDate(selDate)}
-            {isTodaySel && <span style={{ marginLeft:"8px", background:"#2B6B5E", color:"#fff", fontSize:"9px", fontWeight:700, padding:"2px 7px", borderRadius:"10px" }}>TODAY</span>}
+            {isTodaySel && <span style={{ marginLeft:"8px", background:"#3DA07A", color:"#fff", fontSize:"9px", fontWeight:700, padding:"2px 7px", borderRadius:"10px" }}>TODAY</span>}
           </div>
 
           {activeRole?.static ? (
@@ -540,7 +550,7 @@ export default function App() {
                 <a href={activeRole.link} target="_blank" rel="noopener noreferrer" style={{
                   display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"8px",
                   padding:"8px 16px", borderRadius:"8px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                  background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
                 }}>🔗 {activeRole.linkLabel || "Open Link"}</a>
               )}
             </div>
@@ -566,6 +576,13 @@ export default function App() {
                   <div style={{ fontSize:"18px", fontWeight:700, color:T.text }}>{todayEntry.name}</div>
                   {todayEntry.phone && <div style={{ fontSize:"15px", fontWeight:600, color:T.text, marginTop:"4px" }}>📞 {todayEntry.phone}</div>}
                   <PhoneButtons phone={todayEntry.phone} clr={hospital.color} />
+                  {activeRole?.weekdayLink && !isWeekendDay && selectedDay !== "Friday" && (
+                    <a href={activeRole.weekdayLink} target="_blank" rel="noopener noreferrer" style={{
+                      display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"8px",
+                      padding:"8px 16px", borderRadius:"8px", textDecoration:"none",
+                      background:`linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)`, color:"#fff", fontWeight:700, fontSize:"12px",
+                    }}>🔗 {activeRole.weekdayLinkLabel || "Open EHConnect"}</a>
+                  )}
                   {todayEntry.name2 && (
                     <div style={{ marginTop:"12px", paddingTop:"10px", borderTop:`1px solid ${T.dayBorder}` }}>
                       <div style={{ fontSize:"15px", fontWeight:600, color:T.text }}>{todayEntry.name2}</div>
@@ -582,6 +599,13 @@ export default function App() {
               <div style={{ color:T.textMuted, fontSize:"13px" }}>
                 {todayEntry?.name === "Weekend Only" ? "Weekend Only — no weekday schedule for this role" : "No one scheduled"}
               </div>
+              {activeRole?.weekdayLink && !isWeekendDay && selectedDay !== "Friday" && (
+                <a href={activeRole.weekdayLink} target="_blank" rel="noopener noreferrer" style={{
+                  display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"10px",
+                  padding:"8px 16px", borderRadius:"8px", textDecoration:"none",
+                  background:`linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)`, color:"#fff", fontWeight:700, fontSize:"12px",
+                }}>🔗 {activeRole.weekdayLinkLabel || "Open EHConnect"}</a>
+              )}
             </div>
           )}
         </div>
@@ -597,11 +621,11 @@ export default function App() {
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
                 <a href={`sms:${[td,rd].filter(Boolean).join(",")}`} style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px", padding:"12px", borderRadius:"10px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #2B6B5E 0%, #1E5A4A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                  background:"linear-gradient(135deg, #3DA07A 0%, #2E8A6A 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
                 }}>💬 Group Text</a>
-                <a href={`tel:${td || rd},${rd || td}`} style={{
+                <a href={`tel:${td || rd}`} style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px", padding:"12px", borderRadius:"10px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #2B4A7A 0%, #1B3A5C 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
+                  background:`linear-gradient(135deg, ${hospital.color} 0%, ${hospital.color}CC 100%)`, color:"#fff", fontWeight:700, fontSize:"12px",
                 }}>📞 Group Call</a>
               </div>
               <div style={{ fontSize:"10px", color:T.textMuted, textAlign:"center", marginTop:"4px" }}>
