@@ -39,30 +39,30 @@ const HOSPITAL_ROLES = {
   ],
   2: [
     { key:"IR",               label:"IR",                  icon:"🩺", row:0 },
-    { key:"NursingSupervisor",label:"Nursing Supervisor",  icon:"👩‍⚕️", row:0, static:true, phone:"470-382-0191", note:"Nursing Supervisor will provide information on the technologist and the RN on call." },
+    { key:"NursingSupervisor",label:"Nursing Supervisor",  icon:"👩‍⚕️", row:1, static:true, phone:"470-382-0191", note:"Nursing Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",       label:"Anesthesia",          icon:"💉", row:1, static:true, phone:"", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
   ],
   3: [
     { key:"IR",                  label:"IR",                   icon:"🩺", row:0 },
-    { key:"RadiologySupervisor", label:"Radiology Supervisor", icon:"🔬", row:0, static:true, phone:"470-630-7477", note:"Radiology Supervisor will provide information on the technologist and the RN on call." },
+    { key:"RadiologySupervisor", label:"Radiology Supervisor", icon:"🔬", row:1, static:true, phone:"470-630-7477", note:"Radiology Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",          label:"Anesthesia",           icon:"💉", row:1, static:true, phone:"678-371-9038" },
   ],
   4: [
     { key:"IR",          label:"IR",      icon:"🩺", row:0 },
-    { key:"Technologist",label:"IR Tech", icon:"🔧", row:0 },
-    { key:"RN",          label:"RN",      icon:"🩹", row:0 },
+    { key:"Technologist",label:"IR Tech", icon:"🔧", row:1 },
+    { key:"RN",          label:"RN",      icon:"🩹", row:1 },
     { key:"ESJH_CTTech",     label:"CT Tech",          icon:"🖥️", row:1, static:true, phone:"678-843-7093" },
-    { key:"ESJH_Anesthesia", label:"Anesthesia",       icon:"💉", row:1, static:true, phone:"", note:'EHConnect → On-Call → Anesthesiology → select "Anesthesiology - ESJH - Anesthesiologist - 1"', link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
+    { key:"ESJH_Anesthesia", label:"Anesthesia",       icon:"💉", row:2, static:true, phone:"", note:'EHConnect → On-Call → Anesthesiology → select "Anesthesiology - ESJH - Anesthesiologist - 1"', link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"ESJH_RadMain",   label:"Radiology Main",    icon:"📞", row:2, static:true, phone:"678-843-7341" },
     { key:"ESJH_ORFront",   label:"OR Front Desk",     icon:"📞", row:2, static:true, phone:"678-843-7360" },
   ],
   5: [
     { key:"IR",         label:"IR",            icon:"🩺", row:0 },
-    { key:"OCC",        label:"On Call Coordinator / Nursing Supervisor",  icon:"📞", row:0, static:true, phone:"404-491-5493", note:"OCC will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed" },
-    { key:"POS",        label:"Point of Service",     icon:"📞", row:0, static:true, phone:"404-778-8298", note:"POS will help post your case, inform POS if anesthesia assistance will be needed" },
-    { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641" },
-    { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:1, static:true, phone:"470-990-1356" },
-    { key:"Operator",   label:"EJCH Operator", icon:"📞", row:1, static:true, phone:"678-474-7000" },
+    { key:"OCC",        label:"On Call Coordinator / Nursing Supervisor",  icon:"📞", row:1, static:true, phone:"404-491-5493", note:"OCC will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed" },
+    { key:"POS",        label:"Point of Service",     icon:"📞", row:1, static:true, phone:"404-778-8298", note:"POS will help post case" },
+    { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641", noText:true },
+    { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:2, static:true, phone:"470-990-1356" },
+    { key:"Operator",   label:"EJCH Operator", icon:"📞", row:2, static:true, phone:"678-474-7000" },
   ],
   6: [
     { key:"IR",          label:"IR",         icon:"🩺", row:0 },
@@ -437,7 +437,7 @@ export default function App() {
   // #5/#6 Hide full week for roles with hideWeek flag or static roles
   const showFullWeek = !activeRole?.static && !activeRole?.hideWeek;
 
-  const PhoneButtons = ({ phone, clr }) => {
+  const PhoneButtons = ({ phone, clr, noText }) => {
     if (!phone) return null;
     const digits = phone.replace(/[^0-9]/g,"");
     return (
@@ -446,10 +446,10 @@ export default function App() {
           padding:"8px 0", borderRadius:"8px", background:clr, color:"#fff", textDecoration:"none", fontSize:"12px", fontWeight:700 }}>
           📞 Call
         </a>
-        <a href={`sms:${digits}`} style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
+        {!noText && <a href={`sms:${digits}`} style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
           padding:"8px 0", borderRadius:"8px", background:T.oncallBg, border:`1.5px solid ${clr}`, color:clr, textDecoration:"none", fontSize:"12px", fontWeight:700 }}>
           💬 Text
-        </a>
+        </a>}
       </div>
     );
   };
@@ -545,10 +545,10 @@ export default function App() {
               {activeRole.phone ? (
                 <>
                   <div style={{ fontSize:"16px", fontWeight:700, color:T.text }}>{activeRole.phone}</div>
-                  <PhoneButtons phone={activeRole.phone} clr={hospital.color} />
+                  <PhoneButtons phone={activeRole.phone} clr={hospital.color} noText={activeRole.noText} />
                   {activeRole.phone2 && <>
                     <div style={{ fontSize:"14px", fontWeight:600, color:T.text, marginTop:"10px" }}>{activeRole.phone2}</div>
-                    <PhoneButtons phone={activeRole.phone2} clr={hospital.color} />
+                    <PhoneButtons phone={activeRole.phone2} clr={hospital.color} noText={activeRole.noText} />
                   </>}
                 </>
               ) : !activeRole.image ? <div style={{ color:T.textMuted, fontSize:"13px" }}>No number assigned</div> : null}
