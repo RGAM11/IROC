@@ -58,7 +58,7 @@ const HOSPITAL_ROLES = {
   ],
   5: [
     { key:"IR",         label:"IR",            icon:"🩺", row:0 },
-    { key:"OCC",        label:"On Call Coordinator / Nursing Supervisor",  icon:"📞", row:1, static:true, phone:"404-491-5493", note:"OCC will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed" },
+    { key:"OCC",        label:"Nursing Supervisor",  icon:"📞", row:1, static:true, phone:"404-491-5493", badge:"call 1st", note:"RN Supervisor will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed\n\n⚠️ If unable to reach OCC, call EJCH Operator (678-474-7000) and ask for nursing supervisor." },
     { key:"POS",        label:"Point of Service",     icon:"📞", row:1, static:true, phone:"404-778-8298", note:"POS will help post case" },
     { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641", noText:true },
     { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:2, static:true, phone:"470-990-1356" },
@@ -70,7 +70,7 @@ const HOSPITAL_ROLES = {
     { key:"Technologist",label:"IR Tech",    icon:"🔧", row:1, friWeekend:true },
     { key:"RN",          label:"RN",         icon:"🩹", row:1, friWeekend:true },
     { key:"RadFrontDesk",label:"Radiology Front Desk", icon:"📞", row:1, static:true, phone:"404-686-5998", note:"Call to find out the on-call RN and IR Tech" },
-    { key:"CTTech",      label:"CT Tech",    icon:"🖥️", row:2, static:true, phone:"" },
+    { key:"CTTech",      label:"CT Tech",    icon:"🖥️", row:2, static:true, phone:"404-696-8984" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"", note:"Check on EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
   ],
   7: [
@@ -114,7 +114,7 @@ const parseEUHTab = (text, data) => {
     data[id].IR[day] = { name:c(r,2), phone:c(r,3), time: isWE ? "All Day" : "5:00 PM – 7:00 AM" };
     if (id === 1) {
       data[id].Resident[day] = { name:c(r,4), phone:c(r,5), time: isWE ? "All Day" : "5:00 PM – 7:00 AM" };
-      // IH RN (weekend only) — up to 3 people from cols 6-11
+      // IH RN — weekends only
       if (isWE) {
         const entries = [];
         if (c(r,6)) entries.push({ name:c(r,6), phone:c(r,7) });
@@ -133,7 +133,7 @@ const parseEUHTab = (text, data) => {
         data[id].PrimaryRN[day] = { name:c(r,14)||"N/A", phone:c(r,15)||"", time:c(r,14)?"7:00 PM – 7:00 AM":"" };
       }
       data[id].SecondRN[day] = { name:c(r,16)||"N/A", phone:c(r,17)||"", time:c(r,16)?"7:00 PM – 7:00 AM":"" };
-      // IH Tech (weekend only) — up to 2 people from cols 18-21
+      // IH Tech — weekends only
       if (isWE) {
         const entries = [];
         if (c(r,18)) entries.push({ name:c(r,18), phone:c(r,19) });
@@ -505,7 +505,7 @@ export default function App() {
                     boxShadow: act ? `0 2px 6px ${hospital.color}40` : "none",
                   }}>
                     <div style={{ fontSize:"16px" }}>{role.icon}</div>
-                    <div style={{ fontSize:"12px", fontWeight:700, lineHeight:"1.2", marginTop:"2px" }}>{role.label}</div>
+                    <div style={{ fontSize:"12px", fontWeight:700, lineHeight:"1.2", marginTop:"2px" }}>{role.label}{role.badge && <span style={{ fontSize:"9px", fontWeight:600, opacity:0.75, display:"block" }}>({role.badge})</span>}</div>
                   </div>
                 );
               })}
@@ -517,7 +517,7 @@ export default function App() {
         {selectedHospital === 5 && (
           <div style={{ marginBottom:"12px", padding:"12px 14px", borderRadius:"12px", background: dk ? "#1E2A3A" : "#E6EDF8", border:`2px solid ${dk ? "#3D5A7A" : "#8AA0C0"}` }}>
             <div style={{ fontSize:"14px", fontWeight:800, color: dk ? "#C0D0E0" : "#1B3A5C", marginBottom:"5px" }}>📋 EJCH Call Workflow</div>
-            <div style={{ fontSize:"13px", color: dk ? "#B0C0D0" : "#2A3A5A", lineHeight:"1.5", whiteSpace:"pre-line" }}>{"1. Call OCC/RN Supervisor — give appropriate info\n2. Call Anesthesia (if needed)\n3. Enter Procedure order\n\nOn-call team (RN/IR Tech) will post case utilizing P.O.S."}</div>
+            <div style={{ fontSize:"13px", color: dk ? "#B0C0D0" : "#2A3A5A", lineHeight:"1.5", whiteSpace:"pre-line" }}>{"1. Call OCC/RN Supervisor — give appropriate info\n2. Call Anesthesia (if needed)\n3. Enter Procedure order\nOn-call team (RN/IR Tech) will post case utilizing P.O.S."}</div>
           </div>
         )}
 
@@ -668,11 +668,6 @@ export default function App() {
           </>
         )}
 
-        {selectedHospital === 5 && effectiveRole === "OCC" && (
-          <div style={{ marginTop:"10px", padding:"10px", borderRadius:"8px", background: dk ? "#2A2518" : "#FDF4DE", fontSize:"14px", color: dk ? "#D4A84A" : "#7A6228" }}>
-            ⚠️ If unable to reach OCC, call EJCH Operator (678-474-7000) and ask for nursing supervisor.
-          </div>
-        )}
       </div>
     </div>
   );
