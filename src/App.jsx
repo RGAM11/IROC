@@ -36,19 +36,19 @@ const HOSPITAL_ROLES = {
     { key:"CTTech",      label:"CT Tech",           icon:"🖥️", row:3, static:true, phone:"404-712-7036" },
     { key:"Anesthesia",  label:"Anesthesia",        icon:"💉", row:3, static:true, phone:"404-712-7283", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"EUH_Schedule", label:"Emailed Schedule", icon:"📋", row:4, static:true, phone:"", image:"/euh-schedule.png" },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:5, static:true, phone:"", note:"Contact your department for additional numbers" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:5, static:true, phone:"", tieLines:[{shortcut:"2-XXXX", prefix:"404712", display:"404-712-XXXX"},{shortcut:"8-XXXX", prefix:"404778", display:"404-778-XXXX"}] },
   ],
   2: [
     { key:"IR",               label:"IR",                  icon:"🩺", row:0, hideWeek:true },
     { key:"NursingSupervisor",label:"Nursing Supervisor",  icon:"👩‍⚕️", row:1, static:true, phone:"470-382-0191", note:"Nursing Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",       label:"Anesthesia",          icon:"💉", row:1, static:true, phone:"", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"", note:"Contact your department for additional numbers" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"", tieLines:[{shortcut:"1-XXXX", prefix:"404501", display:"404-501-XXXX"}] },
   ],
   3: [
     { key:"IR",                  label:"IR",                   icon:"🩺", row:0, hideWeek:true },
     { key:"RadiologySupervisor", label:"Radiology Supervisor", icon:"🔬", row:1, static:true, phone:"470-630-7477", note:"Radiology Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",          label:"Anesthesia",           icon:"💉", row:1, static:true, phone:"678-371-9038" },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"", note:"Contact your department for additional numbers" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"", tieLines:[{shortcut:"1-XXXX", prefix:"404501", display:"404-501-XXXX"}] },
   ],
   4: [
     { key:"IR",          label:"IR",      icon:"🩺", row:0, hideWeek:true },
@@ -58,7 +58,7 @@ const HOSPITAL_ROLES = {
     { key:"ESJH_Anesthesia", label:"Anesthesia",       icon:"💉", row:2, static:true, phone:"", note:'EHConnect → On-Call → Anesthesiology → select "Anesthesiology - ESJH - Anesthesiologist - 1"', link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"ESJH_RadMain",   label:"Radiology Main",    icon:"📞", row:2, static:true, phone:"678-843-7341" },
     { key:"ESJH_ORFront",   label:"OR Front Desk",     icon:"📞", row:2, static:true, phone:"678-843-7360" },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", tieLines:[{shortcut:"3-XXXX", prefix:"404843", display:"404-843-XXXX"}] },
   ],
   5: [
     { key:"IR",         label:"IR",            icon:"🩺", row:0, hideWeek:true },
@@ -67,7 +67,7 @@ const HOSPITAL_ROLES = {
     { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641", noText:true },
     { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:2, static:true, phone:"470-990-1356" },
     { key:"Operator",   label:"EJCH Operator", icon:"📞", row:2, static:true, phone:"678-474-7000" },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", tieLines:[{shortcut:"4-XXXX", prefix:"404474", display:"404-474-XXXX"}] },
   ],
   6: [
     { key:"IR",          label:"IR",         icon:"🩺", row:0, hideWeek:true },
@@ -77,7 +77,7 @@ const HOSPITAL_ROLES = {
     { key:"RadFrontDesk",label:"Radiology Front Desk", icon:"📞", row:1, static:true, phone:"404-686-5998", note:"Call to find out the on-call RN and IR Tech" },
     { key:"CTTech",      label:"CT Tech",    icon:"🖥️", row:2, static:true, phone:"404-696-8984" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"", note:"Check on EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", tieLines:[{shortcut:"6-XXXX", prefix:"404686", display:"404-686-XXXX"}] },
   ],
   7: [
     { key:"IR",          label:"IR",         icon:"🩺", row:0, hideWeek:true },
@@ -86,7 +86,7 @@ const HOSPITAL_ROLES = {
     { key:"RN",          label:"RN",         icon:"🩹", row:1, hideWeek:true },
     { key:"MTC",         label:"MTC",        icon:"🏥", row:2, static:true, phone:"404-616-2226" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"404-852-3253" },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", tieLines:[{shortcut:"5-XXXX", prefix:"404616", display:"404-616-XXXX"},{shortcut:"4-XXXX", prefix:"404489", display:"404-489-XXXX"}] },
   ],
 };
 
@@ -274,6 +274,53 @@ function ZoomImage({ src, alt, color, T }) {
         <div onClick={()=>{const ns=Math.max(1,scale-0.5); setScale(ns); if(ns<=1) setPos({x:0,y:0});}} style={{ padding:"6px 14px", borderRadius:"6px", background:color, color:"#fff", fontSize:"14px", fontWeight:700, cursor:"pointer" }}>－</div>
         {scale>1 && <div onClick={reset} style={{ padding:"6px 14px", borderRadius:"6px", background:T.roleBg, border:`1px solid ${T.roleBorder}`, color:T.roleText, fontSize:"12px", fontWeight:700, cursor:"pointer" }}>Reset</div>}
       </div>
+    </div>
+  );
+}
+
+// Tie Line Dialer — enter last 4 digits, tap to call full number
+function TieLineDialer({ tieLines, T, color }) {
+  const [digits, setDigits] = useState("");
+  const [selected, setSelected] = useState(0);
+  const full = digits.length === 4 ? tieLines[selected].prefix + digits : null;
+  const fullDisplay = digits.length === 4 ? tieLines[selected].display.replace("XXXX", digits) : null;
+  return (
+    <div style={{ marginTop:"10px" }}>
+      <div style={{ fontSize:"12px", fontWeight:700, color:T.text, marginBottom:"8px" }}>📞 Tie Line Dialer</div>
+      <div style={{ display:"flex", gap:"6px", marginBottom:"8px" }}>
+        {tieLines.map((tl, i) => (
+          <div key={i} onClick={()=>setSelected(i)} style={{
+            flex:1, padding:"8px 6px", borderRadius:"8px", textAlign:"center", cursor:"pointer", fontSize:"12px", fontWeight:600,
+            background: selected === i ? color : T.roleBg,
+            color: selected === i ? "#fff" : T.roleText,
+            border:`1.5px solid ${selected === i ? color : T.roleBorder}`,
+          }}>{tl.shortcut}</div>
+        ))}
+      </div>
+      <div style={{ display:"flex", gap:"6px", alignItems:"center" }}>
+        <div style={{ flex:1 }}>
+          <input type="tel" maxLength={4} placeholder="4 digits" value={digits}
+            onChange={e => setDigits(e.target.value.replace(/[^0-9]/g,"").slice(0,4))}
+            style={{
+              width:"100%", padding:"8px 6px", borderRadius:"8px", fontSize:"16px", fontWeight:600, letterSpacing:"4px",
+              border:`2px solid ${digits.length === 4 ? color : T.roleBorder}`,
+              background:T.roleBg, color:T.text, outline:"none", textAlign:"center",
+              boxSizing:"border-box",
+            }} />
+        </div>
+        {full ? (
+          <a href={`tel:${full}`} style={{
+            flex:1, padding:"10px 8px", borderRadius:"8px", background:color, color:"#fff",
+            textDecoration:"none", fontWeight:700, fontSize:"13px", textAlign:"center", display:"block",
+          }}>📞 Call</a>
+        ) : (
+          <div style={{ flex:1, padding:"10px 8px", borderRadius:"8px", background:T.roleBg, border:`1.5px solid ${T.roleBorder}`,
+            color:T.textMuted, fontSize:"12px", textAlign:"center" }}>
+            {digits.length > 0 ? `${4-digits.length} more digit${4-digits.length!==1?"s":""}` : "Enter last 4"}
+          </div>
+        )}
+      </div>
+      {fullDisplay && <div style={{ fontSize:"12px", color:T.textSub, textAlign:"center", marginTop:"4px" }}>→ {fullDisplay}</div>}
     </div>
   );
 }
@@ -563,7 +610,7 @@ export default function App() {
                     <PhoneButtons phone={activeRole.phone2} clr={hospital.color} noText={activeRole.noText} />
                   </>}
                 </>
-              ) : !activeRole.image ? <div style={{ color:T.textMuted, fontSize:"13px" }}>No number assigned</div> : null}
+              ) : null}
               {/* #3 Notes: 14px, no italic */}
               {activeRole.note && <div style={{ fontSize:"14px", color: dk ? "#D4A84A" : "#8A6D2A", marginTop:"8px", whiteSpace:"pre-line" }}>⚠️ {activeRole.note}</div>}
               {activeRole.image && <ZoomImage src={activeRole.image} alt={activeRole.label} color={hospital.color} T={T} />}
@@ -574,6 +621,7 @@ export default function App() {
                   background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
                 }}>🔗 {activeRole.linkLabel || "Open Link"}</a>
               )}
+              {activeRole.tieLines && <TieLineDialer tieLines={activeRole.tieLines} T={T} color={hospital.color} />}
             </div>
           ) : todayEntry && todayEntry.name && todayEntry.name !== "N/A" && todayEntry.name !== "Weekend Only" ? (
             <div style={{ borderRadius:"12px", border:`2px solid ${hospital.color}30`, background:T.oncallBg, padding:"12px" }}>
