@@ -25,61 +25,68 @@ const HOSP_ID = { EUH:1, EHH:2, EDH:3, ESJH:4, EJCH:5, "MT/WEM":6, "MTWEM":6, GM
 // #2 EUH + EHH Anesthesia: EHConnect link/note
 const HOSPITAL_ROLES = {
   1: [
-    { key:"IR",          label:"IR",              icon:"🩺", row:0 },
-    { key:"Resident",    label:"Resident",        icon:"🙃", row:0 },
+    { key:"IR",          label:"IR",              icon:"🩺", row:0, hideWeek:true },
+    { key:"Resident",    label:"Resident",        icon:"🙃", row:0, hideWeek:true },
     { key:"IHRN",        label:"In-House RN",           icon:"🩹", row:1, tint:"#ECF3F8", weekendOnly:true },
     { key:"PrimaryRN",   label:"Primary RN",      icon:"🩹", row:1, tint:"#ECF3F8" },
     { key:"SecondRN",    label:"2nd RN",           icon:"🩹", row:1, tint:"#ECF3F8", weekdayLink:"https://ehconnect.eushc.org/", weekdayLinkLabel:"Open EHConnect" },
     { key:"IHTech",      label:"In-House Tech",          icon:"🔧", row:2, tint:"#EEF5F1", weekendOnly:true },
     { key:"PrimaryTech", label:"Primary IR Tech",  icon:"🔧", row:2, tint:"#EEF5F1" },
     { key:"SecondTech",  label:"2nd IR Tech",       icon:"🔧", row:2, tint:"#EEF5F1", weekdayLink:"https://ehconnect.eushc.org/", weekdayLinkLabel:"Open EHConnect" },
-    { key:"CTTech",      label:"CT Tech",           icon:"🖥️", row:3, static:true, phone:"" },
+    { key:"CTTech",      label:"CT Tech",           icon:"🖥️", row:3, static:true, phone:"404-712-7036" },
     { key:"Anesthesia",  label:"Anesthesia",        icon:"💉", row:3, static:true, phone:"404-712-7283", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"EUH_Schedule", label:"Emailed Schedule", icon:"📋", row:4, static:true, phone:"", image:"/euh-schedule.png" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:5, static:true, phone:"", note:"Contact your department for additional numbers" },
   ],
   2: [
-    { key:"IR",               label:"IR",                  icon:"🩺", row:0 },
+    { key:"IR",               label:"IR",                  icon:"🩺", row:0, hideWeek:true },
     { key:"NursingSupervisor",label:"Nursing Supervisor",  icon:"👩‍⚕️", row:1, static:true, phone:"470-382-0191", note:"Nursing Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",       label:"Anesthesia",          icon:"💉", row:1, static:true, phone:"", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"", note:"Contact your department for additional numbers" },
   ],
   3: [
-    { key:"IR",                  label:"IR",                   icon:"🩺", row:0 },
+    { key:"IR",                  label:"IR",                   icon:"🩺", row:0, hideWeek:true },
     { key:"RadiologySupervisor", label:"Radiology Supervisor", icon:"🔬", row:1, static:true, phone:"470-630-7477", note:"Radiology Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",          label:"Anesthesia",           icon:"💉", row:1, static:true, phone:"678-371-9038" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"", note:"Contact your department for additional numbers" },
   ],
   4: [
-    { key:"IR",          label:"IR",      icon:"🩺", row:0 },
+    { key:"IR",          label:"IR",      icon:"🩺", row:0, hideWeek:true },
     { key:"Technologist",label:"IR Tech", icon:"🔧", row:1 },
     { key:"RN",          label:"RN",      icon:"🩹", row:1 },
     { key:"ESJH_CTTech",     label:"CT Tech",          icon:"🖥️", row:1, static:true, phone:"678-843-7093" },
     { key:"ESJH_Anesthesia", label:"Anesthesia",       icon:"💉", row:2, static:true, phone:"", note:'EHConnect → On-Call → Anesthesiology → select "Anesthesiology - ESJH - Anesthesiologist - 1"', link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"ESJH_RadMain",   label:"Radiology Main",    icon:"📞", row:2, static:true, phone:"678-843-7341" },
     { key:"ESJH_ORFront",   label:"OR Front Desk",     icon:"📞", row:2, static:true, phone:"678-843-7360" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
   ],
   5: [
-    { key:"IR",         label:"IR",            icon:"🩺", row:0 },
+    { key:"IR",         label:"IR",            icon:"🩺", row:0, hideWeek:true },
     { key:"OCC",        label:"Nursing Supervisor",  icon:"📞", row:1, static:true, phone:"404-491-5493", badge:"call 1st", note:"RN Supervisor will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed\n\n⚠️ If unable to reach OCC, call EJCH Operator (678-474-7000) and ask for nursing supervisor." },
     { key:"POS",        label:"Point of Service",     icon:"📞", row:1, static:true, phone:"404-778-8298", note:"POS will help post case" },
     { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641", noText:true },
     { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:2, static:true, phone:"470-990-1356" },
     { key:"Operator",   label:"EJCH Operator", icon:"📞", row:2, static:true, phone:"678-474-7000" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
   ],
   6: [
-    { key:"IR",          label:"IR",         icon:"🩺", row:0 },
-    { key:"Resident",    label:"Resident",   icon:"🙃", row:0 },
+    { key:"IR",          label:"IR",         icon:"🩺", row:0, hideWeek:true },
+    { key:"Resident",    label:"Resident",   icon:"🙃", row:0, hideWeek:true },
     { key:"Technologist",label:"IR Tech",    icon:"🔧", row:1, friWeekend:true },
     { key:"RN",          label:"RN",         icon:"🩹", row:1, friWeekend:true },
     { key:"RadFrontDesk",label:"Radiology Front Desk", icon:"📞", row:1, static:true, phone:"404-686-5998", note:"Call to find out the on-call RN and IR Tech" },
     { key:"CTTech",      label:"CT Tech",    icon:"🖥️", row:2, static:true, phone:"404-696-8984" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"", note:"Check on EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
   ],
   7: [
-    { key:"IR",          label:"IR",         icon:"🩺", row:0 },
-    { key:"Resident",    label:"Resident",   icon:"🙃", row:0 },
+    { key:"IR",          label:"IR",         icon:"🩺", row:0, hideWeek:true },
+    { key:"Resident",    label:"Resident",   icon:"🙃", row:0, hideWeek:true },
     { key:"Technologist",label:"IR Tech",    icon:"🔧", row:1, hideWeek:true },
     { key:"RN",          label:"RN",         icon:"🩹", row:1, hideWeek:true },
     { key:"MTC",         label:"MTC",        icon:"🏥", row:2, static:true, phone:"404-616-2226" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"404-852-3253" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", note:"Contact your department for additional numbers" },
   ],
 };
 
@@ -356,7 +363,7 @@ export default function App() {
           <div style={{ position:"relative" }}>
             <div style={{ position:"absolute", top:"85%", left:"50%", transform:"translate(-50%,-50%)", width:"55vw", maxWidth:"300px", aspectRatio:"1",
               backgroundImage:`url("${CREST_URL}")`, backgroundSize:"contain", backgroundRepeat:"no-repeat", backgroundPosition:"center",
-              opacity: dk ? 0.04 : 0.07, pointerEvents:"none", zIndex:0 }} />
+              opacity: dk ? 0.07 : 0.07, pointerEvents:"none", zIndex:0, filter: dk ? "invert(1)" : "none" }} />
             <div style={{ paddingTop:"76px", textAlign:"center", position:"relative", zIndex:1 }}>
               <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
               <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
@@ -394,6 +401,11 @@ export default function App() {
                   background:"linear-gradient(135deg, #C5DDE9 0%, #9CC5E0 100%)", color:"#2A4A5F", fontWeight:700, fontSize:"13px",
                 }}><span>📄</span> Blank Consent</a>
               </div>
+              <a href="https://login.microsoftonline.com/e004fb9c-b0a4-424f-bcd0-322606d5df38/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&ear%5Fjwe%5Fcrypto=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImFwdiI6IkFBQUFDVVZoY2tOc2FXVnVkR2dBQUFCRlEwc3pNQUFBQUpJR1lzbStJSjVEMU5TbU5HL3RwYWh5bTZqVXlWNVpFZmozR3RXK0FrMStRditkTGlGdzNKc25TcEhHZk9WTXVLeEJsTFNqUExhd1lIQTI5ayt0QndOYmE1dmlLM2ozTnpxR0JubUViMXNXcEttTTlXa2J4ZjAzTlNEaHFDZUdjZ0FBQUJoeU9wMy8zSEdkbVRDcVV2eGRsR1VWcUFOQythN0VmUFk9In0%3D&ear%5Fjwk=eyJhbGciOiJFQ0RILUVTIiwiY3J2IjoiUC0zODQiLCJ4IjoiQUFBQU1KSUdZc20rSUo1RDFOU21ORy90cGFoeW02alV5VjVaRWZqM0d0VytBazErUXYrZExpRnczSnNuU3BIR2ZPVk11QT09IiwieSI6IkFBQUFNS3hCbExTalBMYXdZSEEyOWsrdEJ3TmJhNXZpSzNqM056cUdCbm1FYjFzV3BLbU05V2tieGYwM05TRGhxQ2VHY2c9PSIsImt0eSI6IkVDIn0%3D&spa%5Fclient%5Fid=08e18876%2D6177%2D487e%2Db8b5%2Dcf950c1e598c&client%5Finfo=1&response%5Ftype=code%20id%5Ftoken%20spa%5Frt&resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&scope=openid&nonce=4AE8661AA7463540F6A9B6325A39CFF8901F255A95BC6DE7%2D9494BA717D411087C1C45D5C24BCF455BDD924B4D04EE6C063C575BBF63EB244&redirect%5Furi=https%3A%2F%2Femory%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&state=OD0wJjMyPUFBTDRuQUFBQUJRNzI4MlFkU1lLamZBU0pYSiUyRmI4aVo4VzV2aGhhJTJGRzE2R2NvVkh1YU84c05pZlRrYmtid1Qza2hibkNHSCUyQnlGUDc4WkNLaDZtMVpLaVlCVkpaNCUyRnhOZ3lJMTF5RUIyRTJDM1hrS25lOTdNbXFiU1ZKSVFTVXlEaFBiaThiWnNlVEE4YXd4OTB4YXdwYVBlNyUyQk1FWXVseVlDN3hBY3dYQjVCZ2x2N1UwV3dJVyUyQkJRWkRhY0tCam5jZDR1RkolMkZWazhUSlJVOUN6Q0NOUndKbDBMbUJINGwyUCUyQnJJeGNTbmxNOFhHaVlDNEprJTJGbUg5R2NOUXFWZlFqcXBKOUlwYnFYT3FhalZrcE05WXJwUnhpT1dwQVBzTXNzYU4yOFJKJTJGd3l5UVA4N3cyVVB2WWk3Q3JPczJSTDlObTV0JTJGNHNnUWw4czBpbXBRSzE0Z1JzMzJsMFNEOURqNGlMYjlNdCUyRk9tNzFCamh4RDNCMlExdDE4bU1yMW4wTkNJayUzRA&claims=%7B%22id%5Ftoken%22%3A%7B%22xms%5Fcc%22%3A%7B%22values%22%3A%5B%22CP1%22%5D%7D%7D%7D&wsucxt=1&cobrandid=11bd8083%2D87e0%2D41b5%2Dbb78%2D0bc43c8a8e8a&client%2Drequest%2Did=57b818a2%2Db001%2D8000%2D10c8%2Da79f04538046&sso_reload=true" target="_blank" rel="noopener noreferrer" style={{
+                display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
+                padding:"14px 12px", borderRadius:"12px", textDecoration:"none", marginTop:"8px",
+                background:"linear-gradient(135deg, #2B5797 0%, #1A3A6A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
+              }}><span>☁️</span> OneDrive - Call Sign Out</a>
             </div>
 
             <div style={{ marginTop:"40px", display:"flex", justifyContent:"center", gap:"10px" }}>
@@ -491,21 +503,21 @@ export default function App() {
 
         {/* ROLE selector */}
         <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.textMuted, fontWeight:700, marginBottom:"5px", textTransform:"uppercase" }}>Role</div>
-        <div style={{ display:"flex", flexDirection:"column", gap:"6px", marginBottom:"14px" }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:"4px", marginBottom:"12px" }}>
           {Object.keys(rowGroups).sort().map(rn => (
-            <div key={rn} style={{ display:"grid", gridTemplateColumns:`repeat(${rowGroups[rn].length},1fr)`, gap:"6px" }}>
+            <div key={rn} style={{ display:"grid", gridTemplateColumns:`repeat(${rowGroups[rn].length},1fr)`, gap:"4px" }}>
               {rowGroups[rn].map(role => {
                 const act = effectiveRole === role.key;
                 return (
                   <div key={role.key} onClick={()=>setSelectedRole(role.key)} style={{
-                    textAlign:"center", padding:"10px 4px", borderRadius:"10px", cursor:"pointer",
+                    textAlign:"center", padding:"7px 3px", borderRadius:"8px", cursor:"pointer",
                     background: act ? hospital.color : (role.tint && !dk ? role.tint : T.roleBg),
                     border:`2px solid ${act ? hospital.color : T.roleBorder}`,
                     color: act ? "#fff" : T.roleText,
                     boxShadow: act ? `0 2px 6px ${hospital.color}40` : "none",
                   }}>
-                    <div style={{ fontSize:"16px" }}>{role.icon}</div>
-                    <div style={{ fontSize:"12px", fontWeight:700, lineHeight:"1.2", marginTop:"2px" }}>{role.label}{role.badge && <span style={{ fontSize:"9px", fontWeight:600, opacity:0.75, display:"block" }}>({role.badge})</span>}</div>
+                    <div style={{ fontSize:"14px" }}>{role.icon}</div>
+                    <div style={{ fontSize:"10px", fontWeight:700, lineHeight:"1.2", marginTop:"1px" }}>{role.label}{role.badge && <span style={{ fontSize:"8px", fontWeight:600, opacity:0.75, display:"block" }}>({role.badge})</span>}</div>
                   </div>
                 );
               })}
@@ -538,7 +550,7 @@ export default function App() {
           </div>
 
           {activeRole?.static ? (
-            <div style={{ borderRadius:"12px", border:`2px solid ${hospital.color}30`, background:T.oncallBg, padding:"14px" }}>
+            <div style={{ borderRadius:"12px", border:`2px solid ${hospital.color}30`, background:T.oncallBg, padding:"12px" }}>
               <div style={{ fontSize:"10px", fontWeight:700, color:hospital.color, letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>
                 {activeRole.icon} {activeRole.label}
               </div>
@@ -564,26 +576,23 @@ export default function App() {
               )}
             </div>
           ) : todayEntry && todayEntry.name && todayEntry.name !== "N/A" && todayEntry.name !== "Weekend Only" ? (
-            <div style={{ borderRadius:"12px", border:`2px solid ${hospital.color}30`, background:T.oncallBg, padding:"14px" }}>
-              <div style={{ fontSize:"10px", fontWeight:700, color:hospital.color, letterSpacing:"1px", textTransform:"uppercase", marginBottom:"3px" }}>
-                {activeRole?.icon} {activeRole?.label}
+            <div style={{ borderRadius:"12px", border:`2px solid ${hospital.color}30`, background:T.oncallBg, padding:"12px" }}>
+              <div style={{ fontSize:"11px", fontWeight:700, color:hospital.color, letterSpacing:"1px", textTransform:"uppercase", marginBottom:"6px" }}>
+                {activeRole?.icon} {activeRole?.label}{todayEntry.time ? ` — ${todayEntry.time}` : ""}
               </div>
-              {todayEntry.time && <div style={{ fontSize:"12px", color:T.textSub, marginBottom:"6px" }}>{todayEntry.time}</div>}
-              {/* Multi-person entries (IH RN/Tech) */}
+              {/* Multi-person entries (In-House RN/Tech) */}
               {todayEntry.entries && todayEntry.entries.length > 0 ? (
-                <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
                   {todayEntry.entries.map((e, idx) => (
-                    <div key={idx} style={{ paddingTop: idx > 0 ? "10px" : "0", borderTop: idx > 0 ? `1px solid ${T.dayBorder}` : "none" }}>
-                      <div style={{ fontSize:"16px", fontWeight:700, color:T.text }}>{e.name}</div>
-                      {e.phone && <div style={{ fontSize:"14px", fontWeight:600, color:T.text, marginTop:"2px" }}>📞 {e.phone}</div>}
+                    <div key={idx} style={{ paddingTop: idx > 0 ? "8px" : "0", borderTop: idx > 0 ? `1px solid ${T.dayBorder}` : "none" }}>
+                      <div style={{ fontSize:"15px", fontWeight:700, color:T.text }}>{e.name}{e.phone ? <span style={{ fontWeight:500, fontSize:"13px", color:T.textSub }}> · 📞 {e.phone}</span> : ""}</div>
                       <PhoneButtons phone={e.phone} clr={hospital.color} />
                     </div>
                   ))}
                 </div>
               ) : (
                 <>
-                  <div style={{ fontSize:"18px", fontWeight:700, color:T.text }}>{todayEntry.name}</div>
-                  {todayEntry.phone && <div style={{ fontSize:"15px", fontWeight:600, color:T.text, marginTop:"4px" }}>📞 {todayEntry.phone}</div>}
+                  <div style={{ fontSize:"16px", fontWeight:700, color:T.text }}>{todayEntry.name}{todayEntry.phone ? <span style={{ fontWeight:500, fontSize:"13px", color:T.textSub }}> · 📞 {todayEntry.phone}</span> : ""}</div>
                   <PhoneButtons phone={todayEntry.phone} clr={hospital.color} />
                   {activeRole?.weekdayLink && !isWeekendDay && selectedDay !== "Friday" && (
                     <a href={activeRole.weekdayLink} target="_blank" rel="noopener noreferrer" style={{
@@ -593,10 +602,8 @@ export default function App() {
                     }}>🔗 {activeRole.weekdayLinkLabel || "Open EHConnect"}</a>
                   )}
                   {todayEntry.name2 && (
-                    <div style={{ marginTop:"12px", paddingTop:"10px", borderTop:`1px solid ${T.dayBorder}` }}>
-                      <div style={{ fontSize:"15px", fontWeight:600, color:T.text }}>{todayEntry.name2}</div>
-                      {todayEntry.time2 && <div style={{ fontSize:"11px", color:T.textSub }}>{todayEntry.time2}</div>}
-                      {todayEntry.phone2 && <div style={{ fontSize:"14px", fontWeight:600, color:T.text, marginTop:"3px" }}>📞 {todayEntry.phone2}</div>}
+                    <div style={{ marginTop:"10px", paddingTop:"8px", borderTop:`1px solid ${T.dayBorder}` }}>
+                      <div style={{ fontSize:"14px", fontWeight:600, color:T.text }}>{todayEntry.name2}{todayEntry.time2 ? <span style={{ fontWeight:400, fontSize:"11px", color:T.textSub }}> · {todayEntry.time2}</span> : ""}{todayEntry.phone2 ? <span style={{ fontWeight:500, fontSize:"12px", color:T.textSub }}> · 📞 {todayEntry.phone2}</span> : ""}</div>
                       <PhoneButtons phone={todayEntry.phone2} clr={hospital.color} />
                     </div>
                   )}
