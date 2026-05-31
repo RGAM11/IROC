@@ -650,7 +650,7 @@ export default function App() {
                 return (
                   <div key={sub.key} style={{ borderRadius:"12px", border:`2px solid ${hospital.color}40`, background:boxBg, padding:"10px" }}>
                     <div style={{ fontSize:"12px", fontWeight:800, color:hospital.color, letterSpacing:"1px", textTransform:"uppercase", textAlign:"center", marginBottom:"6px" }}>
-                      {sub.label}
+                      {sub.label}{sub.weekendOnly && entry?.time ? ` — ${entry.time}` : ""}
                     </div>
                     {hasData ? (
                       <>
