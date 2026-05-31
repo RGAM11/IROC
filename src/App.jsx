@@ -59,7 +59,7 @@ const HOSPITAL_ROLES = {
   ],
   4: [
     { key:"IR",          label:"IR",      icon:"🩺", row:0, hideWeek:true },
-    { key:"Technologist",label:"IR Tech", icon:"🔧", row:1, hideWeek:true },
+    { key:"Technologist",label:"IR Tech", icon:"🔧", row:1 },
     { key:"RN",          label:"IR RN",  icon:"🩹", row:1 },
     { key:"ESJH_CTTech",     label:"CT Tech",          icon:"🖥️", row:1, static:true, phone:"678-843-7093" },
     { key:"ESJH_Anesthesia", label:"Anesthesia",       icon:"💉", row:2, static:true, phone:"", note:'EHConnect → On-Call → Anesthesiology → select "Anesthesiology - ESJH - Anesthesiologist - 1"', link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
@@ -529,8 +529,8 @@ export default function App() {
 
   return (
     <div style={{ minHeight:"100vh", background:T.detailBg, fontFamily:font, overflowX:"hidden" }}>
-      {/* #8 Header — full name only, no abbreviation */}
-      <div style={{ background:hospital.color, padding:"18px 16px", display:"flex", alignItems:"center", gap:"10px", position:"sticky", top:0, zIndex:100 }}>
+      {/* Fixed header */}
+      <div style={{ background:hospital.color, padding:"18px 16px", display:"flex", alignItems:"center", gap:"10px", position:"fixed", top:0, left:0, right:0, zIndex:100 }}>
         <div onClick={()=>setSelectedHospital(null)} style={{
           padding:"10px 20px", borderRadius:"10px", background:"rgba(255,255,255,0.2)",
           color:"#fff", fontSize:"15px", fontWeight:700, cursor:"pointer", flexShrink:0,
@@ -544,7 +544,7 @@ export default function App() {
         }}>📍 Navigate</a>
       </div>
 
-      <div style={{ padding:"12px 12px 40px", maxWidth:"500px", margin:"0 auto" }}>
+      <div style={{ padding:"68px 12px 40px", maxWidth:"500px", margin:"0 auto" }}>
         {/* #4 DAY selector FIRST — double sized */}
         <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.textMuted, fontWeight:700, marginBottom:"5px", textTransform:"uppercase" }}>Day</div>
         <div style={{ display:"flex", gap:"4px", marginBottom:"14px" }}>
