@@ -635,10 +635,13 @@ export default function App() {
               )}
               {activeRole.tieLines && <TieLineDialer tieLines={activeRole.tieLines} T={T} color={hospital.color} />}
               {activeRole.numbers && activeRole.numbers.map((n, i) => (
-                <div key={i} style={{ marginTop: i === 0 ? "4px" : "6px", fontSize:"14px" }}>
-                  <span style={{ fontWeight:600, color:T.text }}>{n.label}</span>
-                  <span style={{ color:T.textSub }}> — </span>
-                  <a href={`tel:${n.phone.replace(/[^0-9]/g,"")}`} style={{ color:hospital.color, fontWeight:600, textDecoration:"none" }}>{n.phone}</a>
+                <div key={i} style={{ marginTop: i === 0 ? "6px" : "10px", paddingTop: i > 0 ? "10px" : "0", borderTop: i > 0 ? `1px solid ${T.dayBorder}` : "none" }}>
+                  <div style={{ fontSize:"13px", fontWeight:700, color:T.text, marginBottom:"6px" }}>{n.label}</div>
+                  <a href={`tel:${n.phone.replace(/[^0-9]/g,"")}`} style={{
+                    display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
+                    padding:"10px 0", borderRadius:"8px", background:hospital.color, color:"#fff",
+                    textDecoration:"none", fontSize:"14px", fontWeight:700,
+                  }}>📞 {n.phone}</a>
                 </div>
               ))}
             </div>
