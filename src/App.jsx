@@ -635,13 +635,15 @@ export default function App() {
               )}
               {activeRole.tieLines && <TieLineDialer tieLines={activeRole.tieLines} T={T} color={hospital.color} />}
               {activeRole.numbers && activeRole.numbers.map((n, i) => (
-                <div key={i} style={{ marginTop: i === 0 ? "6px" : "10px", paddingTop: i > 0 ? "10px" : "0", borderTop: i > 0 ? `1px solid ${T.dayBorder}` : "none" }}>
-                  <div style={{ fontSize:"13px", fontWeight:700, color:T.text, marginBottom:"6px" }}>{n.label}</div>
-                  <a href={`tel:${n.phone.replace(/[^0-9]/g,"")}`} style={{
-                    display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
-                    padding:"10px 0", borderRadius:"8px", background:hospital.color, color:"#fff",
-                    textDecoration:"none", fontSize:"14px", fontWeight:700,
-                  }}>📞 {n.phone}</a>
+                <div key={i} style={{ paddingTop: i > 0 ? "8px" : "4px", paddingBottom:"8px", borderBottom: `1px solid ${T.dayBorder}` }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                    <div style={{ fontSize:"13px", fontWeight:700, color:T.text, flexShrink:0 }}>{n.label}</div>
+                    <a href={`tel:${n.phone.replace(/[^0-9]/g,"")}`} style={{
+                      flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
+                      padding:"8px 0", borderRadius:"8px", background:hospital.color, color:"#fff",
+                      textDecoration:"none", fontSize:"13px", fontWeight:700,
+                    }}>📞 {n.phone}</a>
+                  </div>
                 </div>
               ))}
             </div>
