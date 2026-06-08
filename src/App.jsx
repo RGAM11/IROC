@@ -40,7 +40,7 @@ const HOSPITAL_ROLES = {
     { key:"CTTech",      label:"CT Tech",           icon:"🖥️", row:1, static:true, phone:"404-712-7036" },
     { key:"Anesthesia",  label:"Anesthesia",        icon:"💉", row:2, static:true, phone:"404-712-7283", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"TieLines",    label:"Tie Line Dialer",   icon:"📞", row:2, static:true, phone:"", tieLines:[{shortcut:"2-XXXX", prefix:"404712", display:"404-712-XXXX"},{shortcut:"8-XXXX", prefix:"404778", display:"404-778-XXXX"}] },
-    { key:"OtherPhones", label:"Other Numbers",     icon:"📱", row:2, static:true, phone:"" },
+    { key:"OtherPhones", label:"Other Numbers",     icon:"📱", row:2, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-712-2000"}] },
     { key:"EUH_Schedule", label:"Emailed Schedule", icon:"📋", row:3, static:true, phone:"", image:"/euh-schedule.png" },
   ],
   2: [
@@ -48,14 +48,14 @@ const HOSPITAL_ROLES = {
     { key:"NursingSupervisor",label:"Nursing Supervisor",  icon:"👩‍⚕️", row:1, static:true, phone:"470-382-0191", note:"Nursing Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",       label:"Anesthesia",          icon:"💉", row:1, static:true, phone:"", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:2, static:true, phone:"", tieLines:[{shortcut:"1-XXXX", prefix:"404501", display:"404-501-XXXX"}] },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-501-8000"}] },
   ],
   3: [
     { key:"IR",                  label:"IR",                   icon:"🩺", row:0, hideWeek:true },
     { key:"RadiologySupervisor", label:"Radiology Supervisor", icon:"🔬", row:1, static:true, phone:"470-630-7477", note:"Radiology Supervisor will provide information on the technologist and the RN on call." },
     { key:"Anesthesia",          label:"Anesthesia",           icon:"💉", row:1, static:true, phone:"678-371-9038" },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:2, static:true, phone:"", tieLines:[{shortcut:"1-XXXX", prefix:"404501", display:"404-501-XXXX"}] },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-501-1000"}] },
   ],
   4: [
     { key:"IR",          label:"IR",      icon:"🩺", row:0, hideWeek:true },
@@ -66,17 +66,16 @@ const HOSPITAL_ROLES = {
     { key:"ESJH_RadMain",   label:"Radiology Main",    icon:"📞", row:2, static:true, phone:"678-843-7341" },
     { key:"ESJH_ORFront",   label:"OR Front Desk",     icon:"📞", row:2, static:true, phone:"678-843-7360" },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:3, static:true, phone:"", tieLines:[{shortcut:"3-XXXX", prefix:"404843", display:"404-843-XXXX"}] },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"" , numbers:[{label:"Operator", phone:"678-843-7001"}] },
   ],
   5: [
     { key:"IR",         label:"IR",            icon:"🩺", row:0, hideWeek:true },
-    { key:"OCC",        label:"Nursing Supervisor",  icon:"📞", row:1, static:true, phone:"404-491-5493", badge:"call 1st", note:"RN Supervisor will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed\n\n⚠️ If unable to reach OCC, call EJCH Operator (678-474-7000) and ask for nursing supervisor." },
+    { key:"OCC",        label:"Nursing Supervisor",  icon:"📞", row:1, static:true, phone:"404-491-5493", badge:"call 1st", note:"RN Supervisor will call in IR Tech & RN.\n\nProvide following:\n• Patient name, MRN, location\n• Planned procedure & expected time\n• If anesthesia needed\n\n⚠️ If unable to reach, call EJCH Operator (678-474-7000) and ask for nursing supervisor." },
     { key:"POS",        label:"Point of Service",     icon:"📞", row:1, static:true, phone:"404-778-8298", note:"POS will help post case" },
-    { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:1, static:true, phone:"470-707-5459", phone2:"470-686-2641", noText:true },
+    { key:"CTTech",     label:"CT Tech",       icon:"🖥️", row:2, static:true, phone:"470-707-5459", phone2:"470-686-2641", noText:true },
     { key:"Anesthesia", label:"Anesthesia",    icon:"💉", row:2, static:true, phone:"470-990-1356" },
-    { key:"Operator",   label:"EJCH Operator", icon:"📞", row:2, static:true, phone:"678-474-7000" },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:3, static:true, phone:"", tieLines:[{shortcut:"4-XXXX", prefix:"404474", display:"404-474-XXXX"}] },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"", numbers:[{label:"Operator", phone:"678-474-7000"}] },
   ],
   6: [
     { key:"IR",          label:"IR",         icon:"🩺", row:0, hideWeek:true },
@@ -87,7 +86,7 @@ const HOSPITAL_ROLES = {
     { key:"CTTech",      label:"CT Tech",    icon:"🖥️", row:2, static:true, phone:"404-696-8984" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"", note:"Check on EHConnect for on-call anesthesiologist", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:3, static:true, phone:"", tieLines:[{shortcut:"6-XXXX", prefix:"404686", display:"404-686-XXXX"}] },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-686-4411"}] },
   ],
   7: [
     { key:"IR",          label:"IR",         icon:"🩺", row:0, hideWeek:true },
@@ -97,7 +96,7 @@ const HOSPITAL_ROLES = {
     { key:"MTC",         label:"MTC",        icon:"🏥", row:2, static:true, phone:"404-616-2226" },
     { key:"Anesthesia",  label:"Anesthesia", icon:"💉", row:2, static:true, phone:"404-852-3253" },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:3, static:true, phone:"", tieLines:[{shortcut:"5-XXXX", prefix:"404616", display:"404-616-XXXX"},{shortcut:"4-XXXX", prefix:"404489", display:"404-489-XXXX"}] },
-    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"" },
+    { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:3, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-616-1000"}] },
   ],
 };
 
@@ -590,7 +589,7 @@ export default function App() {
         {selectedHospital === 5 && (
           <div style={{ marginBottom:"12px", padding:"12px 14px", borderRadius:"12px", background: dk ? "#1E2A3A" : "#E6EDF8", border:`2px solid ${dk ? "#3D5A7A" : "#8AA0C0"}` }}>
             <div style={{ fontSize:"14px", fontWeight:800, color: dk ? "#C0D0E0" : "#1B3A5C", marginBottom:"5px" }}>📋 EJCH Call Workflow</div>
-            <div style={{ fontSize:"13px", color: dk ? "#B0C0D0" : "#2A3A5A", lineHeight:"1.5", whiteSpace:"pre-line" }}>{"1. Call OCC/RN Supervisor — give appropriate info\n2. Call Anesthesia (if needed)\n3. Enter Procedure order\nOn-call team (RN/IR Tech) will post case utilizing P.O.S."}</div>
+            <div style={{ fontSize:"13px", color: dk ? "#B0C0D0" : "#2A3A5A", lineHeight:"1.5", whiteSpace:"pre-line" }}>{"1. Call RN Supervisor — give appropriate info\n2. Call Anesthesia (if needed)\n3. Enter Procedure order\nOn-call team (RN/IR Tech) will post case utilizing P.O.S."}</div>
           </div>
         )}
 
@@ -635,6 +634,13 @@ export default function App() {
                 }}>🔗 {activeRole.linkLabel || "Open Link"}</a>
               )}
               {activeRole.tieLines && <TieLineDialer tieLines={activeRole.tieLines} T={T} color={hospital.color} />}
+              {activeRole.numbers && activeRole.numbers.map((n, i) => (
+                <div key={i} style={{ marginTop: i === 0 ? "4px" : "8px" }}>
+                  <div style={{ fontSize:"12px", fontWeight:700, color:T.text }}>{n.label}</div>
+                  <div style={{ fontSize:"15px", fontWeight:600, color:T.text, marginTop:"2px" }}>📞 {n.phone}</div>
+                  <PhoneButtons phone={n.phone} clr={hospital.color} />
+                </div>
+              ))}
             </div>
           ) : activeRole?.composite ? (
             <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
