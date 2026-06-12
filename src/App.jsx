@@ -41,7 +41,6 @@ const HOSPITAL_ROLES = {
     { key:"Anesthesia",  label:"Anesthesia",        icon:"💉", row:2, static:true, phone:"404-712-7283", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"TieLines",    label:"Tie Line Dialer",   icon:"📞", row:2, static:true, phone:"", tieLines:[{shortcut:"2-XXXX", prefix:"404712", display:"404-712-XXXX"},{shortcut:"8-XXXX", prefix:"404778", display:"404-778-XXXX"}] },
     { key:"OtherPhones", label:"Other Numbers",     icon:"📱", row:2, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-712-2000"}] },
-    { key:"EUH_Schedule", label:"Emailed Schedule", icon:"📋", row:3, static:true, phone:"", image:"/euh-schedule.png" },
   ],
   2: [
     { key:"IR",               label:"IR",                  icon:"🩺", row:0, hideWeek:true },
