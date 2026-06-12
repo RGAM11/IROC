@@ -636,7 +636,7 @@ export default function App() {
               {activeRole.numbers && activeRole.numbers.map((n, i) => (
                 <div key={i} style={{ paddingTop: i > 0 ? "8px" : "4px", paddingBottom:"8px", borderBottom: `1px solid ${T.dayBorder}` }}>
                   <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-                    <div style={{ fontSize:"13px", fontWeight:700, color:T.text, flexShrink:0 }}>{n.label}</div>
+                    <div style={{ flex:1, fontSize:"15px", fontWeight:700, color:T.text }}>{n.label}</div>
                     <a href={`tel:${n.phone.replace(/[^0-9]/g,"")}`} style={{
                       flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
                       padding:"8px 0", borderRadius:"8px", background:hospital.color, color:"#fff",
