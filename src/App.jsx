@@ -303,15 +303,15 @@ function TieLineDialer({ tieLines, T, color }) {
         <div style={{ display:"flex", flexDirection:"column", gap:"4px" }}>
           {tieLines.map((tl, i) => (
             <div key={i} onClick={()=>setSelected(i)} style={{
-              padding:"7px 10px", borderRadius:"8px", textAlign:"center", cursor:"pointer", fontSize:"11px", fontWeight:600, whiteSpace:"nowrap",
+              padding:"9px 14px", borderRadius:"8px", textAlign:"center", cursor:"pointer", fontSize:"13px", fontWeight:600, whiteSpace:"nowrap",
               background: selected === i ? color : T.roleBg,
               color: selected === i ? "#fff" : T.roleText,
               border:`1.5px solid ${selected === i ? color : T.roleBorder}`,
             }}>{tl.shortcut}</div>
           ))}
         </div>
-        <div style={{ flex:"0 0 35%" }}>
-          <input type="tel" maxLength={4} placeholder="4 digits" value={digits}
+        <div style={{ flex: full ? "0 0 35%" : 1 }}>
+          <input type="tel" maxLength={4} placeholder="enter 4 digits" value={digits}
             onChange={e => setDigits(e.target.value.replace(/[^0-9]/g,"").slice(0,4))}
             style={{
               width:"100%", height:"100%", padding:"8px 4px", borderRadius:"8px", fontSize:"18px", fontWeight:600, letterSpacing:"5px",
@@ -320,17 +320,12 @@ function TieLineDialer({ tieLines, T, color }) {
               boxSizing:"border-box",
             }} />
         </div>
-        {full ? (
+        {full && (
           <a href={`tel:${full}`} style={{
             flex:1, display:"flex", alignItems:"center", justifyContent:"center",
             padding:"8px 6px", borderRadius:"8px", background:color, color:"#fff",
             textDecoration:"none", fontWeight:700, fontSize:"12px", textAlign:"center",
           }}>📞 {fullDisplay}</a>
-        ) : (
-          <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center",
-            padding:"8px 6px", borderRadius:"8px", background:T.roleBg, border:`1.5px solid ${T.roleBorder}`,
-            color:T.textMuted, fontSize:"11px", textAlign:"center",
-          }}>{digits.length > 0 ? `${4-digits.length} more` : "Enter 4 digits"}</div>
         )}
       </div>
     </div>
