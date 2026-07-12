@@ -9,6 +9,10 @@ const CSV_TABS = {
   gmh:      `${BASE}?gid=1818891382&single=true&output=csv`,
 };
 
+// Google Apps Script endpoint that emails suggestions to radsgam@gmail.com.
+// Deploy the script (see instructions) and paste its Web App URL here:
+const SUGGESTION_ENDPOINT = "https://script.google.com/macros/s/AKfycbzRp_C5rwTJJ4262-Vr5JkMrxDvZTXHkBB3dAUXy8pco2JH5igv4gXrhXoblRoCHjYD1A/exec";
+
 const DAYS = ["Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
 
 const HOSPITALS = [
@@ -426,6 +430,8 @@ export default function App() {
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedDay, setSelectedDay] = useState(getDayName());
+  const [suggestion, setSuggestion] = useState("");
+  const [sugStatus, setSugStatus] = useState("idle"); // idle | sending | sent | error
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState("light");
 
@@ -566,6 +572,50 @@ export default function App() {
                 padding:"14px 12px", borderRadius:"12px", textDecoration:"none", marginTop:"8px",
                 background:"linear-gradient(135deg, #2B5797 0%, #1A3A6A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
               }}><span>☁️</span> OneDrive - Call Sign Out</a>
+            </div>
+
+            {/* Divider */}
+            <div style={{ height:"1px", background:T.cardBorder, margin:"22px 30px" }} />
+
+            {/* Suggestion box */}
+            <div style={{ background: dk ? "#132033" : "#FFFFFF", border:`1.5px solid ${T.cardBorder}`, borderRadius:"12px", padding:"10px" }}>
+              <div style={{ fontSize:"10px", letterSpacing:"1.5px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"6px" }}>
+                💡 Suggest an Improvement
+              </div>
+              <textarea
+                value={suggestion}
+                onChange={(e)=>{ setSuggestion(e.target.value); if (sugStatus==="sent"||sugStatus==="error") setSugStatus("idle"); }}
+                placeholder="Idea, issue, or feature request…"
+                rows={2}
+                style={{ width:"100%", boxSizing:"border-box", padding:"8px", borderRadius:"9px", resize:"vertical",
+                  border:`1px solid ${T.cardBorder}`, background: dk ? "#0F1D30" : "#F7FAFC",
+                  color: dk ? "#E2E8F0" : "#1E293B", fontSize:"13px", fontFamily:"inherit" }}
+              />
+              <div
+                onClick={async ()=>{
+                  if (!suggestion.trim() || sugStatus==="sending") return;
+                  setSugStatus("sending");
+                  const url = `${SUGGESTION_ENDPOINT}?s=${encodeURIComponent(suggestion.trim())}`;
+                  try {
+                    await fetch(url, { method:"GET", mode:"no-cors", cache:"no-store" });
+                    setSugStatus("sent"); setSuggestion("");
+                  } catch(e) {
+                    // Fallback: image beacon — bypasses fetch/CORS restrictions entirely
+                    try {
+                      const img = new Image();
+                      img.src = url + "&t=" + Date.now();
+                      setSugStatus("sent"); setSuggestion("");
+                    } catch(e2) { setSugStatus("error"); }
+                  }
+                }}
+                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", marginTop:"6px",
+                  padding:"10px", borderRadius:"9px", fontWeight:700, fontSize:"13px",
+                  background: sugStatus==="sent" ? "#2A9D5A" : (suggestion.trim() ? "linear-gradient(135deg, #3D7A8F 0%, #2B5A6C 100%)" : (dk ? "#1A2A3F" : "#E2E8F0")),
+                  color: (suggestion.trim()||sugStatus==="sent") ? "#fff" : T.textMuted,
+                  cursor: suggestion.trim() ? "pointer" : "default" }}
+              >
+                {sugStatus==="sending" ? "Sending…" : sugStatus==="sent" ? "✓ Sent — thank you!" : sugStatus==="error" ? "Couldn't send — tap to retry" : "📨 Send Suggestion"}
+              </div>
             </div>
 
             <div style={{ marginTop:"40px", display:"flex", justifyContent:"center", gap:"10px" }}>
