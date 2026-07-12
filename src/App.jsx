@@ -11,7 +11,7 @@ const CSV_TABS = {
 
 // Google Apps Script endpoint that emails suggestions to radsgam@gmail.com.
 // Deploy the script (see instructions) and paste its Web App URL here:
-const SUGGESTION_ENDPOINT = "https://script.google.com/macros/s/AKfycbzRp_C5rwTJJ4262-Vr5JkMrxDvZTXHkBB3dAUXy8pco2JH5igv4gXrhXoblRoCHjYD1A/exec";
+const SUGGESTION_ENDPOINT = "https://script.google.com/macros/s/AKfycbxpP4gX31KCTJKzFsq7qna3u-GpQxd5GhMCXQtyfYCVE7WddPGpDw8tFEk5EUvtMRX2Gg/exec";
 
 const DAYS = ["Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
 
@@ -594,16 +594,17 @@ export default function App() {
               <div
                 onClick={async ()=>{
                   if (!suggestion.trim() || sugStatus==="sending") return;
+                  const text = suggestion.trim();
                   setSugStatus("sending");
-                  const url = `${SUGGESTION_ENDPOINT}?s=${encodeURIComponent(suggestion.trim())}`;
+                  const url = `${SUGGESTION_ENDPOINT}?s=${encodeURIComponent(text)}&t=${Date.now()}`;
                   try {
-                    await fetch(url, { method:"GET", mode:"no-cors", cache:"no-store" });
+                    await fetch(url, { method:"GET", mode:"no-cors", cache:"no-store", redirect:"follow" });
                     setSugStatus("sent"); setSuggestion("");
                   } catch(e) {
-                    // Fallback: image beacon — bypasses fetch/CORS restrictions entirely
+                    // Fallback: image beacon — can't be blocked by CORS
                     try {
                       const img = new Image();
-                      img.src = url + "&t=" + Date.now();
+                      img.src = url;
                       setSugStatus("sent"); setSuggestion("");
                     } catch(e2) { setSugStatus("error"); }
                   }
