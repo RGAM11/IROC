@@ -616,24 +616,18 @@ export default function App() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          {/* #7 Watermark behind title */}
-          <div style={{ position:"relative" }}>
-            <div style={{ position:"absolute", top:"85%", left:"50%", transform:"translate(-50%,-50%)", width:"55vw", maxWidth:"300px", aspectRatio:"1",
-              backgroundImage:`url("${CREST_URL}")`, backgroundSize:"contain", backgroundRepeat:"no-repeat", backgroundPosition:"center",
-              opacity: dk ? 0.07 : 0.07, pointerEvents:"none", zIndex:0, filter: dk ? "invert(1)" : "none" }} />
-            <div style={{ paddingTop:"76px", textAlign:"center", position:"relative", zIndex:1 }}>
-              <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
-              <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
-                <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
-                <span style={{ color: dk ? "#4A85C0" : "#4A6FA0" }}>R</span>
-                <span style={{ color: dk ? "#3068A8" : "#4A7EA0" }}>O</span>
-                <span style={{ color: dk ? "#8BADE0" : "#1E3A5F" }}>C</span>
-              </div>
-              <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:"4px", marginTop:"4px" }}>
-                <div style={{ width:"28px", height:"4px", borderRadius:"2px", background: dk ? "#3068A8" : "#4A7EA0" }} />
-                <div style={{ width:"8px", height:"4px", borderRadius:"2px", background: dk ? "#4A85C0" : "#4A6FA0" }} />
-                <div style={{ width:"5px", height:"4px", borderRadius:"2px", background: dk ? "#6A9FD0" : "#7BA3C9" }} />
-              </div>
+          <div style={{ paddingTop:"48px", textAlign:"center", position:"relative", zIndex:1 }}>
+            <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
+            <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
+              <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
+              <span style={{ color: dk ? "#4A85C0" : "#4A6FA0" }}>R</span>
+              <span style={{ color: dk ? "#3068A8" : "#4A7EA0" }}>O</span>
+              <span style={{ color: dk ? "#8BADE0" : "#1E3A5F" }}>C</span>
+            </div>
+            <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:"4px", marginTop:"4px" }}>
+              <div style={{ width:"28px", height:"4px", borderRadius:"2px", background: dk ? "#3068A8" : "#4A7EA0" }} />
+              <div style={{ width:"8px", height:"4px", borderRadius:"2px", background: dk ? "#4A85C0" : "#4A6FA0" }} />
+              <div style={{ width:"5px", height:"4px", borderRadius:"2px", background: dk ? "#6A9FD0" : "#7BA3C9" }} />
             </div>
           </div>
 
@@ -711,7 +705,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.2.1
+              IROC v10.2.3
             </div>
 
             <div style={{ height:"30px" }} />
@@ -996,7 +990,11 @@ export default function App() {
                 <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
                   {todayEntry.entries.map((e, idx) => (
                     <div key={idx} style={{ paddingTop: idx > 0 ? "8px" : "0", borderTop: idx > 0 ? `1px solid ${T.dayBorder}` : "none" }}>
-                      <div style={{ fontSize:"15px", fontWeight:700, color:T.text }}>{e.name}{e.phone ? <span style={{ fontWeight:500, fontSize:"13px", color:T.textSub }}> · 📞 {e.phone}</span> : ""}</div>
+                      <div style={{ fontSize:"15px", fontWeight:700, color:T.text }}>
+                        {e.name}
+                        {e.time ? <span style={{ fontWeight:500, fontSize:"12px", color:T.textSub }}> · {e.time}</span> : ""}
+                        {e.phone ? <span style={{ fontWeight:500, fontSize:"13px", color:T.textSub }}> · 📞 {e.phone}</span> : ""}
+                      </div>
                       <PhoneButtons phone={e.phone} clr={hospital.color} />
                     </div>
                   ))}
