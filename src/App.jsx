@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import EditMode from "./Edit";
 
-const BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8WCngGjo-orcDfBB2hyCmcljMSwMPh3lEE243hQ0mnDrTojxCUPxwhgNcgdjdHg/pub";
+const BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSz1MLm6ZSF1hSKaxr6bdDrO98npeCxLhrkaxcdsKytZgAIPE80wCs1o0ot5ATTPcjTuf3wRfgs1VVM/pub";
 const CSV_TABS = {
   euh:      `${BASE}?gid=775592937&single=true&output=csv`,
   ehhedh:   `${BASE}?gid=1534156653&single=true&output=csv`,
@@ -12,6 +13,30 @@ const CSV_TABS = {
 // Google Apps Script endpoint that emails suggestions to radsgam@gmail.com.
 // Deploy the script (see instructions) and paste its Web App URL here:
 const SUGGESTION_ENDPOINT = "https://script.google.com/macros/s/AKfycbxpP4gX31KCTJKzFsq7qna3u-GpQxd5GhMCXQtyfYCVE7WddPGpDw8tFEk5EUvtMRX2Gg/exec";
+
+// ─── Anonymous usage logging ───
+// Logs WHAT was used, never WHO used it. No names, no phone numbers, no call
+// destinations. "Device" is a random string generated on this phone — it lets
+// us count unique users without identifying anyone.
+const getDeviceId = () => {
+  try {
+    let id = localStorage.getItem("iroc_did");
+    if (!id) {
+      id = Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("iroc_did", id);
+    }
+    return id;
+  } catch (e) { return "na"; }
+};
+
+const logEvent = (ev, hospital = "", role = "") => {
+  try {
+    const url = `${SUGGESTION_ENDPOINT}?log=1&ev=${encodeURIComponent(ev)}`
+      + `&h=${encodeURIComponent(hospital)}&r=${encodeURIComponent(role)}`
+      + `&d=${encodeURIComponent(getDeviceId())}&t=${Date.now()}`;
+    fetch(url, { method: "GET", mode: "no-cors", cache: "no-store" }).catch(() => {});
+  } catch (e) { /* logging must never break the app */ }
+};
 
 const DAYS = ["Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
 
@@ -143,12 +168,13 @@ const c = (r, i) => clean(r[i]);
 
 // ── Helpers for banner + other numbers (shared) ──
 const parseBanner = (rows, data, id) => {
-  const bi = findAnchor(rows, "SPECIAL INSTRUCTIONS");
+  let bi = findAnchor(rows, "SPECIAL INSTRUCTIONS");
+  if (bi < 0) bi = findAnchor(rows, "ANNOUNCEMENT");
   if (bi >= 0) {
     // instruction text is in the next non-empty row, col 0
     for (let r = bi+1; r < Math.min(bi+3, rows.length); r++) {
       const txt = c(rows[r], 0);
-      if (txt && !txt.toUpperCase().includes("SPECIAL INSTRUCTIONS")) { data[id]._banner = txt; break; }
+      if (txt && !txt.toUpperCase().includes("SPECIAL INSTRUCTIONS") && !txt.toUpperCase().includes("ANNOUNCEMENT")) { data[id]._banner = txt; break; }
     }
   }
 };
@@ -183,27 +209,47 @@ const parseEUHTab = (text, data) => {
     }
   }
 
-  // ③ RN Weekend / ④ Tech Weekend
-  const parseWeekend = (anchorText, nIH, keyIH, keyPrimary, keySecond) => {
+  // ③ RN Weekend / ④ Tech Weekend — Name/Time/Phone triplets, labels in header
+  const parseWeekend = (anchorText, keyIH, keyPrimary, keySecond) => {
     const a = findAnchor(rows, anchorText); if (a < 0) return;
-    for (let r = a+2; r < a+4 && r < rows.length; r++) {
-      const day = c(rows[r],1); if (day!=="Saturday" && day!=="Sunday") continue;
-      // layout: col0 HOSP, col1 DAY, then per slot: Name, Phone
-      let col = 2; const ih = [];
-      for (let k=0;k<nIH;k++){ const nm=c(rows[r],col), ph=c(rows[r],col+1); if(nm) ih.push({name:nm,phone:ph}); col+=2; }
-      data[id][keyIH][day] = ih.length ? { name:ih.map(e=>e.name).join(", "), phone:ih[0]?.phone||"", time:"7:00 AM – 7:30 PM", entries:ih } : { name:"N/A", phone:"", time:"" };
-      const pdN=c(rows[r],col),pdP=c(rows[r],col+1); col+=2;
-      const pnN=c(rows[r],col),pnP=c(rows[r],col+1); col+=2;
-      if (pdN && pnN) data[id][keyPrimary][day] = { name:pdN, phone:pdP, time:"7:00 AM – 7:00 PM", name2:pnN, phone2:pnP, time2:"7:00 PM – 7:00 AM" };
-      else if (pdN) data[id][keyPrimary][day] = { name:pdN, phone:pdP, time:"7:00 AM – 7:00 PM" };
-      else if (pnN) data[id][keyPrimary][day] = { name:pnN, phone:pnP, time:"7:00 PM – 7:00 AM" };
-      else data[id][keyPrimary][day] = { name:"N/A", phone:"", time:"" };
-      const s2N=c(rows[r],col),s2P=c(rows[r],col+1);
-      data[id][keySecond][day] = s2N ? { name:s2N, phone:s2P, time:"7:00 PM – 7:00 AM" } : { name:"N/A", phone:"", time:"" };
+    const hdr = rows[a+1] || [];
+    // slot labels sit every 3rd column starting at index 2
+    const labels = [];
+    for (let c = 2; c < hdr.length; c += 3) {
+      const lb = clean(hdr[c]); if (!lb) break;
+      labels.push(lb.split("\n")[0]);
+    }
+    if (!labels.length) return;
+
+    for (let r = a+2; r < a+5 && r < rows.length; r++) {
+      const day = c(rows[r],1);
+      if (day !== "Saturday" && day !== "Sunday") continue;
+
+      const ih = [], primary = [], second = [], extra = [];
+      labels.forEach((lb, k) => {
+        const base = 2 + k*3;
+        const nm = c(rows[r], base), tm = c(rows[r], base+1), ph = c(rows[r], base+2);
+        if (!nm) return;
+        const L = lb.toLowerCase();
+        const item = { name:nm, time:tm, phone:ph };
+        if (L.includes("in-house") || L.includes("in house")) ih.push(item);
+        else if (L.includes("primary")) primary.push(item);
+        else if (L.includes("2nd") || L.includes("second")) second.push(item);
+        else extra.push(item);
+      });
+
+      const box = (list, fallbackTime) => list.length
+        ? { name: list.map(e=>e.name).join(", "), phone: list[0].phone || "",
+            time: list[0].time || fallbackTime, entries: list }
+        : { name:"N/A", phone:"", time:"" };
+
+      data[id][keyIH][day]      = box(ih, "7:00 AM – 7:30 PM");
+      data[id][keyPrimary][day] = box(primary.concat(extra), "");
+      data[id][keySecond][day]  = box(second, "7:00 PM – 7:00 AM");
     }
   };
-  parseWeekend("IR RN — WEEKEND", 3, "IHRN", "PrimaryRN", "SecondRN");
-  parseWeekend("IR TECH — WEEKEND", 2, "IHTech", "PrimaryTech", "SecondTech");
+  parseWeekend("IR RN — WEEKEND", "IHRN", "PrimaryRN", "SecondRN");
+  parseWeekend("IR TECH — WEEKEND", "IHTech", "PrimaryTech", "SecondTech");
 
   // ⑤ RN Weekday / ⑥ Tech Weekday — RN1/2/3 (Name,Time,Phone), Mon-Fri
   const parseWeekday = (anchorText, keyPrimary) => {
@@ -227,7 +273,7 @@ const parseEHHEDHTab = (text, data) => {
   // Banner + other numbers apply to both EHH(2) and EDH(3) — store on each
   const bi = findAnchor(rows, "SPECIAL INSTRUCTIONS");
   let banner = "";
-  if (bi>=0) for (let r=bi+1;r<Math.min(bi+3,rows.length);r++){ const t=c(rows[r],0); if(t&&!t.toUpperCase().includes("SPECIAL INSTRUCTIONS")){banner=t;break;} }
+  if (bi>=0) for (let r=bi+1;r<Math.min(bi+3,rows.length);r++){ const t=c(rows[r],0); if(t&&!t.toUpperCase().includes("SPECIAL INSTRUCTIONS") && !t.toUpperCase().includes("ANNOUNCEMENT")){banner=t;break;} }
   const oNums = []; const oi = findAnchor(rows, "OTHER NUMBERS");
   if (oi>=0) for (let r=oi+2;r<rows.length;r++){ const nm=c(rows[r],0),ph=c(rows[r],1); if(nm&&nm.toUpperCase()!=="NAME") oNums.push({label:nm,phone:ph}); }
   [2,3].forEach(hid => { if(data[hid]){ if(banner) data[hid]._banner=banner; if(oNums.length) data[hid]._extraNumbers=oNums; }});
@@ -267,8 +313,8 @@ const parseMTWEMTab = (text, data) => {
 // ─── ESJH-EJCH tab (two tables; EJCH old format IR/OCC/POS) ───
 const parseESJHEJCHTab = (text, data) => {
   const rows = parseCSVRows(text);
-  const bi=findAnchor(rows,"SPECIAL INSTRUCTIONS"); let banner="";
-  if(bi>=0) for(let r=bi+1;r<Math.min(bi+3,rows.length);r++){const t=c(rows[r],0); if(t&&!t.toUpperCase().includes("SPECIAL INSTRUCTIONS")){banner=t;break;}}
+  let bi=findAnchor(rows,"SPECIAL INSTRUCTIONS"); if(bi<0) bi=findAnchor(rows,"ANNOUNCEMENT"); let banner="";
+  if(bi>=0) for(let r=bi+1;r<Math.min(bi+3,rows.length);r++){const t=c(rows[r],0); if(t&&!t.toUpperCase().includes("SPECIAL INSTRUCTIONS") && !t.toUpperCase().includes("ANNOUNCEMENT")){banner=t;break;}}
   const oNums=[]; const oi=findAnchor(rows,"OTHER NUMBERS");
   if(oi>=0) for(let r=oi+2;r<rows.length;r++){const nm=c(rows[r],0),ph=c(rows[r],1); if(nm&&nm.toUpperCase()!=="NAME") oNums.push({label:nm,phone:ph});}
   [4,5].forEach(hid=>{if(data[hid]){if(banner)data[hid]._banner=banner; if(oNums.length)data[hid]._extraNumbers=oNums;}});
@@ -318,12 +364,15 @@ const initData = () => {
 const fetchSchedule = async () => {
   const data = initData();
   try {
+    // cache-bust so a fresh save shows up instead of a stale cached CSV
+    const bust = `&_=${Date.now()}`;
+    const grab = (u) => fetch(u + bust, { cache: "no-store" }).then(r=>r.text());
     const [euh, ehhedh, mtwem, esjhejch, gmh] = await Promise.all([
-      fetch(CSV_TABS.euh).then(r=>r.text()),
-      fetch(CSV_TABS.ehhedh).then(r=>r.text()),
-      fetch(CSV_TABS.mtwem).then(r=>r.text()),
-      fetch(CSV_TABS.esjhejch).then(r=>r.text()),
-      fetch(CSV_TABS.gmh).then(r=>r.text()),
+      grab(CSV_TABS.euh),
+      grab(CSV_TABS.ehhedh),
+      grab(CSV_TABS.mtwem),
+      grab(CSV_TABS.esjhejch),
+      grab(CSV_TABS.gmh),
     ]);
     try { parseEUHTab(euh, data); } catch(e) { console.error("EUH parse error:", e); }
     try { parseEHHEDHTab(ehhedh, data); } catch(e) { console.error("EHH-EDH parse error:", e); }
@@ -434,8 +483,11 @@ export default function App() {
   const [sugStatus, setSugStatus] = useState("idle"); // idle | sending | sent | error
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState("light");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => { fetchSchedule().then(d => setSchedule(d)).finally(() => setLoading(false)); }, []);
+  useEffect(() => { logEvent("open"); }, []);
 
   // Android/iOS back button: navigate within app instead of exiting.
   // When a hospital is opened we push a history entry; the phone back button
@@ -481,6 +533,7 @@ export default function App() {
     setSelectedHospital(id);
     setSelectedRole((HOSPITAL_ROLES[id]||[])[0]?.key || null);
     setSelectedDay(todayName);
+    logEvent("hospital", HOSPITALS.find(h => h.id === id)?.abbr || "");
   };
 
   const getEntry = (hId, rKey, day) => {
@@ -524,6 +577,44 @@ export default function App() {
 
     return (
       <div style={{ minHeight:"100vh", background:T.bg, fontFamily:font, position:"relative", width:"100%", maxWidth:"100vw", overflowX:"hidden" }}>
+
+        {editOpen && (
+          <EditMode endpoint={SUGGESTION_ENDPOINT} T={T} dk={dk}
+            onClose={()=>{ setEditOpen(false); setMenuOpen(false); }} />
+        )}
+
+        {/* ── top-right menu ── */}
+        <div style={{ position:"absolute", top:"14px", right:"14px", zIndex:50 }}>
+          <div onClick={()=>setMenuOpen(o=>!o)}
+            style={{ width:"40px", height:"40px", borderRadius:"10px", display:"flex",
+              alignItems:"center", justifyContent:"center", cursor:"pointer",
+              background:T.card, border:`1px solid ${T.cardBorder}`,
+              color:T.text, fontSize:"18px", fontWeight:700, lineHeight:1 }}>
+            ⋮
+          </div>
+          {menuOpen && (
+            <>
+              <div onClick={()=>setMenuOpen(false)}
+                style={{ position:"fixed", inset:0, zIndex:40 }} />
+              <div style={{ position:"absolute", top:"46px", right:0, zIndex:50, minWidth:"188px",
+                background:T.card, border:`1px solid ${T.cardBorder}`, borderRadius:"12px",
+                overflow:"hidden", boxShadow:"0 8px 24px rgba(0,0,0,0.18)" }}>
+                <div onClick={()=>{ setMenuOpen(false); setEditOpen(true); }}
+                  style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
+                    color:T.text, fontWeight:700, fontSize:"13px", cursor:"pointer",
+                    borderBottom:`1px solid ${T.cardBorder}` }}>
+                  🔒 Scheduler Login
+                </div>
+                <div onClick={()=>{ setTheme(dk ? "light" : "dark"); setMenuOpen(false); }}
+                  style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
+                    color:T.text, fontWeight:600, fontSize:"13px", cursor:"pointer" }}>
+                  {dk ? "☀️ Light mode" : "🌙 Dark mode"}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
         <div style={{ position:"relative", zIndex:1 }}>
           {/* #7 Watermark behind title */}
           <div style={{ position:"relative" }}>
@@ -619,18 +710,10 @@ export default function App() {
               </div>
             </div>
 
-            <div style={{ marginTop:"40px", display:"flex", justifyContent:"center", gap:"10px" }}>
-              <div onClick={()=>setTheme("light")} style={{
-                padding:"10px 24px", borderRadius:"10px", cursor:"pointer", fontWeight:700, fontSize:"12px",
-                background: !dk ? "#fff" : "transparent", color: !dk ? "#1E293B" : T.textMuted,
-                border:`2px solid ${!dk ? "#4A7EA0" : T.cardBorder}`,
-              }}>☀️ Light</div>
-              <div onClick={()=>setTheme("dark")} style={{
-                padding:"10px 24px", borderRadius:"10px", cursor:"pointer", fontWeight:700, fontSize:"12px",
-                background: dk ? "#1A2332" : "transparent", color: dk ? "#E2E8F0" : T.textMuted,
-                border:`2px solid ${dk ? "#4A6FA0" : T.cardBorder}`,
-              }}>🌙 Dark</div>
+            <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
+              IROC v10.2.1
             </div>
+
             <div style={{ height:"30px" }} />
           </div>
         </div>
@@ -668,11 +751,11 @@ export default function App() {
     const digits = phone.replace(/[^0-9]/g,"");
     return (
       <div style={{ display:"flex", gap:"8px", marginTop:"8px" }}>
-        <a href={`tel:${digits}`} style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
+        <a href={`tel:${digits}`} onClick={()=>logEvent("call", hospital?.abbr || "", activeRole?.label || "")} style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
           padding:"8px 0", borderRadius:"8px", background:clr, color:"#fff", textDecoration:"none", fontSize:"12px", fontWeight:700 }}>
           📞 Call
         </a>
-        {!noText && <a href={`sms:${digits}`} style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
+        {!noText && <a href={`sms:${digits}`} onClick={()=>logEvent("text", hospital?.abbr || "", activeRole?.label || "")} style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
           padding:"8px 0", borderRadius:"8px", background:T.oncallBg, border:`1.5px solid ${clr}`, color:clr, textDecoration:"none", fontSize:"12px", fontWeight:700 }}>
           💬 Text
         </a>}
@@ -704,7 +787,7 @@ export default function App() {
           <div style={{ marginBottom:"14px", padding:"12px 14px", borderRadius:"12px",
             background: dk ? "#3A2E14" : "#FFF7E0", border:`2px solid ${dk ? "#B8892E" : "#E0B84A"}` }}>
             <div style={{ fontSize:"10px", fontWeight:800, color: dk ? "#E0B84A" : "#9A6E1A", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>
-              📢 Special Instructions
+              📢 Announcements
             </div>
             <div style={{ fontSize:"14px", color: dk ? "#F0E4C4" : "#5A4A1A", lineHeight:1.5, whiteSpace:"pre-line" }}>
               {schedule[selectedHospital]._banner}
@@ -734,7 +817,7 @@ export default function App() {
               {rowGroups[rn].map(role => {
                 const act = effectiveRole === role.key;
                 return (
-                  <div key={role.key} onClick={()=>setSelectedRole(role.key)} style={{
+                  <div key={role.key} onClick={()=>{ setSelectedRole(role.key); logEvent("role", hospital?.abbr || "", role.label); }} style={{
                     textAlign:"center", padding:"7px 3px", borderRadius:"8px", cursor:"pointer",
                     background: act ? hospital.color : (role.tint && !dk ? role.tint : T.roleBg),
                     border:`2px solid ${act ? hospital.color : T.roleBorder}`,
