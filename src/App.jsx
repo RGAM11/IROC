@@ -638,7 +638,7 @@ export default function App() {
             </div>
             <div style={{ marginTop:"20px" }}><Card h={gmh}/></div>
 
-            <div style={{ marginTop:"40px" }}>
+            <div style={{ marginTop:"40px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}` }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
                 <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" style={{
@@ -705,7 +705,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.2.3
+              IROC v10.2.4
             </div>
 
             <div style={{ height:"30px" }} />
