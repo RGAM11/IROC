@@ -635,7 +635,7 @@ export default function App() {
             </div>
           </div>
 
-          <div style={{ marginTop:"70px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto" }}>
+          <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto" }}>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
               <div style={{ display:"flex", flexDirection:"column", gap:"20px", minWidth:0 }}>{leftCol.map(h=><Card key={h.id} h={h}/>)}</div>
               <div style={{ display:"flex", flexDirection:"column", gap:"20px", minWidth:0 }}>{rightCol.map(h=><Card key={h.id} h={h}/>)}</div>
@@ -709,7 +709,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.6.1
+              IROC v10.6.2
             </div>
 
             <div style={{ height:"30px" }} />
