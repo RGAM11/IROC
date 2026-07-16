@@ -226,10 +226,14 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
     const c = clean();
     setBusy(true); setErr("");
     try {
-      const r = await jsonp(endpoint, { mode:"auth", code:c });
-      if (!r || !r.ok) { setErr(`Code not accepted. Sent: "${c}" (${c.length} chars)`); setBusy(false); return; }
-      const d = await jsonp(endpoint, { mode:"data" });
-      if (!d || !d.ok) { setErr((d && d.error) || "Signed in, but could not read the sheet."); setBusy(false); return; }
+      // one round-trip: authenticate AND load data together (was two calls)
+      const d = await jsonp(endpoint, { mode:"authdata", code:c });
+      if (!d || !d.ok) {
+        setErr(d && d.error === "Bad code"
+          ? `Code not accepted. Sent: "${c}" (${c.length} chars)`
+          : ((d && d.error) || "Could not read the sheet."));
+        setBusy(false); return;
+      }
       setData(d.data); setStaff(d.data.staff); setStep("list");
     } catch (e) { setErr("Could not reach the script: " + e.message); }
     setBusy(false);
