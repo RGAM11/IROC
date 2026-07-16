@@ -519,6 +519,10 @@ export default function App() {
   const dk = theme === "dark";
   const T = {
     bg: dk ? "#0F1724" : "#EDF2F7", card: dk ? "#1A2332" : "#ffffff",
+    // Home-page gradient (#6 light: deeper steel-blue -> soft; #10 dark: radial glow behind title)
+    homeBg: dk
+      ? "radial-gradient(120% 90% at 50% 22%, #26496B 0%, #16283C 48%, #0D1622 100%)"
+      : "linear-gradient(180deg, #BFD6EA 0%, #D7E4F1 42%, #E7EEF5 100%)",
     cardBorder: dk ? "#2D3B4E" : "#D4DAE3", text: dk ? "#E2E8F0" : "#1E293B",
     textSub: dk ? "#8899AA" : "#7E8A9A", textMuted: dk ? "#5A6B7D" : "#94A3B8",
     roleBg: dk ? "#1A2332" : "#fff", roleBorder: dk ? "#3D4F63" : "#B8C4CE",
@@ -576,7 +580,7 @@ export default function App() {
     );
 
     return (
-      <div style={{ minHeight:"100vh", background:T.bg, fontFamily:font, position:"relative", width:"100%", maxWidth:"100vw", overflowX:"hidden" }}>
+      <div style={{ minHeight:"100vh", background:T.homeBg, backgroundAttachment:"fixed", fontFamily:font, position:"relative", width:"100%", maxWidth:"100vw", overflowX:"hidden" }}>
 
         {editOpen && (
           <EditMode endpoint={SUGGESTION_ENDPOINT} T={T} dk={dk}
@@ -616,7 +620,7 @@ export default function App() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          <div style={{ paddingTop:"48px", textAlign:"center", position:"relative", zIndex:1 }}>
+          <div style={{ paddingTop:"68px", textAlign:"center", position:"relative", zIndex:1 }}>
             <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
@@ -638,7 +642,7 @@ export default function App() {
             </div>
             <div style={{ marginTop:"20px" }}><Card h={gmh}/></div>
 
-            <div style={{ marginTop:"40px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}` }}>
+            <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}` }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
                 <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" style={{
@@ -705,7 +709,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.4.0
+              IROC v10.5.0
             </div>
 
             <div style={{ height:"30px" }} />
