@@ -522,7 +522,7 @@ export default function App() {
     // Home-page gradient (#6 light: deeper steel-blue -> soft; #10 dark: radial glow behind title)
     homeBg: dk
       ? "radial-gradient(120% 90% at 50% 22%, #26496B 0%, #16283C 48%, #0D1622 100%)"
-      : "linear-gradient(180deg, #BFD6EA 0%, #D7E4F1 42%, #E7EEF5 100%)",
+      : "linear-gradient(180deg, #CEDCE8 0%, #DCE6EF 42%, #EAEFF4 100%)",
     cardBorder: dk ? "#2D3B4E" : "#D4DAE3", text: dk ? "#E2E8F0" : "#1E293B",
     textSub: dk ? "#8899AA" : "#7E8A9A", textMuted: dk ? "#5A6B7D" : "#94A3B8",
     roleBg: dk ? "#1A2332" : "#fff", roleBorder: dk ? "#3D4F63" : "#B8C4CE",
@@ -620,7 +620,7 @@ export default function App() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          <div style={{ paddingTop:"68px", textAlign:"center", position:"relative", zIndex:1 }}>
+          <div style={{ paddingTop:"92px", textAlign:"center", position:"relative", zIndex:1 }}>
             <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
@@ -709,7 +709,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.5.0
+              IROC v10.6.0
             </div>
 
             <div style={{ height:"30px" }} />
@@ -779,8 +779,7 @@ export default function App() {
       </div>
 
       <div style={{ padding:"68px 12px 40px", maxWidth:"500px", margin:"0 auto" }}>
-        {/* #4 DAY selector FIRST — double sized */}
-        <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.textMuted, fontWeight:700, marginBottom:"5px", textTransform:"uppercase" }}>Day</div>
+        {/* Announcements banner first */}
         {schedule?.[selectedHospital]?._banner && (
           <div style={{ marginBottom:"14px", padding:"12px 14px", borderRadius:"12px",
             background: dk ? "#3A2E14" : "#FFF7E0", border:`2px solid ${dk ? "#B8892E" : "#E0B84A"}` }}>
@@ -792,6 +791,24 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* ESJH Entry Points — directly under announcements */}
+        {selectedHospital === 4 && (
+          <div style={{ marginBottom:"14px", padding:"12px 14px", borderRadius:"12px", background: dk ? "#1E2A3A" : "#FFF8E8", border:`2px solid ${dk ? "#3D5A7A" : "#D4B87A"}` }}>
+            <div style={{ fontSize:"13px", color: dk ? "#D4C090" : "#5A4A20", lineHeight:"1.5" }}>
+              🚪 Entry points after 9pm (Mon-Fri) and on weekends are through the <strong>ED waiting room</strong> &amp; <strong>Winship Main Entrance</strong>.
+            </div>
+          </div>
+        )}
+
+        {/* EJCH Call Workflow — directly under announcements */}
+        {selectedHospital === 5 && (
+          <div style={{ marginBottom:"14px", padding:"12px 14px", borderRadius:"12px", background: dk ? "#1E2A3A" : "#E6EDF8", border:`2px solid ${dk ? "#3D5A7A" : "#8AA0C0"}` }}>
+            <div style={{ fontSize:"14px", fontWeight:800, color: dk ? "#C0D0E0" : "#1B3A5C", marginBottom:"5px" }}>📋 EJCH Call Workflow</div>
+            <div style={{ fontSize:"13px", color: dk ? "#B0C0D0" : "#2A3A5A", lineHeight:"1.5", whiteSpace:"pre-line" }}>{"1. Call RN Supervisor — give appropriate info\n2. Call Anesthesia (if needed)\n3. Enter Procedure order\nOn-call team (RN/IR Tech) will post case utilizing P.O.S."}</div>
+          </div>
+        )}
+
         <div style={{ display:"flex", gap:"4px", marginBottom:"14px" }}>
           {DAYS.map((day,i) => {
             const d = weekDates[i]; const act = selectedDay === day;
@@ -831,22 +848,6 @@ export default function App() {
           ))}
         </div>
 
-        {/* EJCH Call Workflow — always visible */}
-        {selectedHospital === 5 && (
-          <div style={{ marginBottom:"12px", padding:"12px 14px", borderRadius:"12px", background: dk ? "#1E2A3A" : "#E6EDF8", border:`2px solid ${dk ? "#3D5A7A" : "#8AA0C0"}` }}>
-            <div style={{ fontSize:"14px", fontWeight:800, color: dk ? "#C0D0E0" : "#1B3A5C", marginBottom:"5px" }}>📋 EJCH Call Workflow</div>
-            <div style={{ fontSize:"13px", color: dk ? "#B0C0D0" : "#2A3A5A", lineHeight:"1.5", whiteSpace:"pre-line" }}>{"1. Call RN Supervisor — give appropriate info\n2. Call Anesthesia (if needed)\n3. Enter Procedure order\nOn-call team (RN/IR Tech) will post case utilizing P.O.S."}</div>
-          </div>
-        )}
-
-        {/* ESJH Entry Points */}
-        {selectedHospital === 4 && (
-          <div style={{ marginBottom:"12px", padding:"12px 14px", borderRadius:"12px", background: dk ? "#1E2A3A" : "#FFF8E8", border:`2px solid ${dk ? "#3D5A7A" : "#D4B87A"}` }}>
-            <div style={{ fontSize:"13px", color: dk ? "#D4C090" : "#5A4A20", lineHeight:"1.5" }}>
-              🚪 Entry points after 9pm (Mon-Fri) and on weekends are through the <strong>ED waiting room</strong> and the <strong>Winship Main Entrance</strong>.
-            </div>
-          </div>
-        )}
 
         {/* On-Call Card */}
         <div style={{ marginBottom:"14px" }}>
@@ -1039,7 +1040,7 @@ export default function App() {
           )}
         </div>
 
-        {/* Group Text */}
+        {/* Group Text — ESJH/MTWEM/GMH (single tech + RN per day) */}
         {[4,6,7].includes(selectedHospital) && (effectiveRole === "Technologist" || effectiveRole === "RN") && (() => {
           const te = getEntry(selectedHospital, "Technologist", selectedDay);
           const re = getEntry(selectedHospital, "RN", selectedDay);
@@ -1057,6 +1058,34 @@ export default function App() {
             </div>
           );
         })()}
+
+        {/* Group Text — EUH weekday (multiple RNs + Techs per day via entries) */}
+        {selectedHospital === 1 && !isWeekendDay
+          && (effectiveRole === "PrimaryRN" || effectiveRole === "PrimaryTech") && (() => {
+          const rnE   = getEntry(1, "PrimaryRN", selectedDay);
+          const techE = getEntry(1, "PrimaryTech", selectedDay);
+          const collect = (e) => {
+            const src = (e?.entries && e.entries.length) ? e.entries : (e ? [e] : []);
+            return src.map(x => (x.phone||"").replace(/[^0-9]/g,"")).filter(Boolean);
+          };
+          const nums = [...new Set([...collect(rnE), ...collect(techE)])];
+          if (!nums.length) return null;
+          const nameList = [];
+          if (rnE?.name && rnE.name !== "N/A") nameList.push(rnE.name);
+          if (techE?.name && techE.name !== "N/A") nameList.push(techE.name);
+          return (
+            <div style={{ marginBottom:"14px" }}>
+              <a href={`sms:${nums.join(",")}`} style={{
+                display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", padding:"12px", borderRadius:"10px", textDecoration:"none",
+                background:"linear-gradient(135deg, #3DA07A 0%, #2E8A6A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
+              }}>💬 Group Text IR Tech & RN</a>
+              <div style={{ fontSize:"10px", color:T.textMuted, textAlign:"center", marginTop:"4px" }}>
+                {nameList.join(" + ") || `${nums.length} on call`}
+              </div>
+            </div>
+          );
+        })()}
+
 
         {/* Full Week — hidden for hideWeek and static roles */}
         {showFullWeek && (
