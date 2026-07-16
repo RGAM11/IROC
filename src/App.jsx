@@ -620,7 +620,7 @@ export default function App() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          <div style={{ paddingTop:"92px", textAlign:"center", position:"relative", zIndex:1 }}>
+          <div style={{ paddingTop:"72px", textAlign:"center", position:"relative", zIndex:1 }}>
             <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
@@ -709,7 +709,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.6.0
+              IROC v10.6.1
             </div>
 
             <div style={{ height:"30px" }} />
@@ -764,7 +764,7 @@ export default function App() {
   return (
     <div style={{ minHeight:"100vh", background:T.detailBg, fontFamily:font, overflowX:"hidden" }}>
       {/* Fixed header */}
-      <div style={{ background:hospital.color, padding:"18px 16px", display:"flex", alignItems:"center", gap:"10px", position:"fixed", top:0, left:0, right:0, zIndex:100 }}>
+      <div style={{ background:hospital.color, padding:"18px 16px", paddingTop:"max(18px, env(safe-area-inset-top))", display:"flex", alignItems:"center", gap:"10px", position:"fixed", top:0, left:0, right:0, zIndex:100 }}>
         <div onClick={closeHospital} style={{
           padding:"10px 20px", borderRadius:"10px", background:"rgba(255,255,255,0.2)",
           color:"#fff", fontSize:"15px", fontWeight:700, cursor:"pointer", flexShrink:0,
@@ -778,7 +778,7 @@ export default function App() {
         }}>📍 Navigate</a>
       </div>
 
-      <div style={{ padding:"68px 12px 40px", maxWidth:"500px", margin:"0 auto" }}>
+      <div style={{ padding:"96px 12px 40px", maxWidth:"500px", margin:"0 auto" }}>
         {/* Announcements banner first */}
         {schedule?.[selectedHospital]?._banner && (
           <div style={{ marginBottom:"14px", padding:"12px 14px", borderRadius:"12px",
