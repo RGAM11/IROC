@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import EditMode from "./Edit";
 
+// ═══════════════════════════════════════════════════════════════
+// MAINTENANCE MODE
+// Set MAINTENANCE to true to take IROC offline and show the notice.
+// Set it back to false (and rebuild/push) to bring the app back.
+// ═══════════════════════════════════════════════════════════════
+const MAINTENANCE = true;
+const MAINTENANCE_MESSAGE = "IROC is temporarily paused. Please follow the on-call emails in the meantime.";
+
 const BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSz1MLm6ZSF1hSKaxr6bdDrO98npeCxLhrkaxcdsKytZgAIPE80wCs1o0ot5ATTPcjTuf3wRfgs1VVM/pub";
 const CSV_TABS = {
   euh:      `${BASE}?gid=775592937&single=true&output=csv`,
@@ -474,7 +482,49 @@ function TieLineDialer({ tieLines, T, color }) {
   );
 }
 
+function MaintenanceScreen() {
+  return (
+    <div style={{
+      minHeight:"100vh", width:"100%",
+      background:"linear-gradient(180deg, #16283C 0%, #0D1622 100%)",
+      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+      textAlign:"center", padding:"32px",
+      fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    }}>
+      <div style={{ fontSize:"40px", fontWeight:900, letterSpacing:"3px", lineHeight:1 }}>
+        <span style={{ color:"#7BA3C9" }}>I</span>
+        <span style={{ color:"#5E8FBF" }}>R</span>
+        <span style={{ color:"#4A7EA0" }}>O</span>
+        <span style={{ color:"#C8D8E8" }}>C</span>
+      </div>
+      <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:"4px", marginTop:"8px" }}>
+        <div style={{ width:"28px", height:"4px", borderRadius:"2px", background:"#4A7EA0" }} />
+        <div style={{ width:"8px",  height:"4px", borderRadius:"2px", background:"#5E8FBF" }} />
+        <div style={{ width:"5px",  height:"4px", borderRadius:"2px", background:"#7BA3C9" }} />
+      </div>
+
+      <div style={{ fontSize:"44px", marginTop:"34px", marginBottom:"18px" }}>🚧</div>
+
+      <div style={{ fontSize:"18px", fontWeight:800, color:"#EAF1F8", marginBottom:"12px" }}>
+        Temporarily Paused
+      </div>
+      <div style={{ fontSize:"15px", color:"#AFC2D6", lineHeight:1.6, maxWidth:"340px" }}>
+        {MAINTENANCE_MESSAGE}
+      </div>
+
+      <div style={{ marginTop:"40px", fontSize:"11px", color:"#5B7089", letterSpacing:"1px" }}>
+        INTERVENTIONAL RADIOLOGY ON-CALL
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  if (MAINTENANCE) return <MaintenanceScreen />;
+  return <MainApp />;
+}
+
+function MainApp() {
   const [schedule, setSchedule] = useState(null);
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
@@ -709,7 +759,7 @@ export default function App() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.6.2
+              IROC v10.7.1
             </div>
 
             <div style={{ height:"30px" }} />
