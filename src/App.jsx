@@ -741,7 +741,7 @@ function MainApp() {
         )}
 
         {/* ── top-right menu — level with the IROC title, not selectable ── */}
-        <div style={{ position:"absolute", top:"90px", right:"14px", zIndex:50,
+        <div style={{ position:"absolute", top:"58px", right:"14px", zIndex:50,
           userSelect:"none", WebkitUserSelect:"none", WebkitTouchCallout:"none",
           WebkitTapHighlightColor:"transparent" }}>
           <div onClick={()=>setMenuOpen(o=>!o)}
@@ -775,7 +775,7 @@ function MainApp() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          <div style={{ paddingTop:"72px", textAlign:"center", position:"relative", zIndex:1 }}>
+          <div style={{ paddingTop:"40px", textAlign:"center", position:"relative", zIndex:1 }}>
             <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
@@ -870,7 +870,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.9.4
+              IROC v10.9.5
             </div>
 
             <div style={{ height:"30px" }} />
