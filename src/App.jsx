@@ -95,10 +95,10 @@ const DAYS = ["Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thurs
 const HOSPITALS = [
   { id:1, abbr:"EUH",    name:"Emory University Hospital",     color:"#3D7A8F", address:"1364 Clifton Rd NE, Atlanta, GA 30322" },
   { id:2, abbr:"EHH",    name:"Emory Hillandale Hospital",     color:"#4A8A75", address:"https://maps.app.goo.gl/sVgwEnuatMc4urkL7" },
-  { id:3, abbr:"EDH",    name:"Emory Decatur Hospital",        color:"#7B6BA8", address:"2701 N Decatur Rd, Decatur, GA 30033" },
+  { id:3, abbr:"EDH",    name:"Emory Decatur Hospital",        color:"#4A8A75", address:"2701 N Decatur Rd, Decatur, GA 30033" },
   { id:4, abbr:"ESJH",   name:"Emory Saint Joseph's Hospital", color:"#B8892E", address:"5665 Peachtree Dunwoody Rd, Atlanta, GA 30342" },
   { id:5, abbr:"EJCH",   name:"Emory Johns Creek Hospital",    color:"#A8524A", address:"6325 Hospital Pkwy, Johns Creek, GA 30097" },
-  { id:6, abbr:"MT/WEM", name:"Emory Midtown / WEM",           color:"#4A7EA0", address:"550 Peachtree St NE, Atlanta, GA 30308" },
+  { id:6, abbr:"MT/WEM", name:"Emory Midtown / WEM",           color:"#3D7A8F", address:"550 Peachtree St NE, Atlanta, GA 30308" },
   { id:7, abbr:"GMH",    name:"Grady Memorial Hospital",       color:"#7A5A90", address:"80 Jesse Hill Jr Dr SE, Atlanta, GA 30303" },
 ];
 
@@ -693,8 +693,8 @@ function MainApp() {
 
   // ─── HOME PAGE ───
   if (!selectedHospital) {
-    const leftCol = [1,3,2].map(id => HOSPITALS.find(h=>h.id===id));
-    const rightCol = [6,4,5].map(id => HOSPITALS.find(h=>h.id===id));
+    // Paired rows: EUH + MT/WEM, EDH + EHH, ESJH + EJCH; GMH full width below
+    const pairRows = [[1,6],[3,2],[4,5]].map(r => r.map(id => HOSPITALS.find(h=>h.id===id)));
     const gmh = HOSPITALS.find(h=>h.id===7);
     const onCallDay = getOnCallDayName();
     const previewName = (e) => (e && e.name && e.name !== "N/A" && e.name !== "Weekend Only") ? e.name : null;
@@ -789,9 +789,12 @@ function MainApp() {
           </div>
 
           <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto" }}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
-              <div style={{ display:"flex", flexDirection:"column", gap:"20px", minWidth:0 }}>{leftCol.map(h=><Card key={h.id} h={h}/>)}</div>
-              <div style={{ display:"flex", flexDirection:"column", gap:"20px", minWidth:0 }}>{rightCol.map(h=><Card key={h.id} h={h}/>)}</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:"20px" }}>
+              {pairRows.map((row, i) => (
+                <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
+                  {row.map(h => <Card key={h.id} h={h}/>)}
+                </div>
+              ))}
             </div>
             <div style={{ marginTop:"20px" }}><Card h={gmh}/></div>
 
@@ -862,7 +865,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.9.1
+              IROC v10.9.2
             </div>
 
             <div style={{ height:"30px" }} />
