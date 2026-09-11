@@ -713,7 +713,6 @@ function MainApp() {
           </div>
           <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
             <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
-            <div style={{ color:T.textSub, fontSize:"11px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{h.name}</div>
           </div>
           <div style={{ color:T.textMuted, fontSize:"18px", flexShrink:0 }}>›</div>
         </div>
@@ -863,7 +862,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.9.0
+              IROC v10.9.1
             </div>
 
             <div style={{ height:"30px" }} />
