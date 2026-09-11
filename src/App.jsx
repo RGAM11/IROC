@@ -704,12 +704,12 @@ function MainApp() {
       return (
       <div onClick={()=>handleSelectHospital(h.id)} style={{
         background:T.card, borderRadius:"12px",
-        padding:"12px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
+        padding:"8px 10px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
         transition:"all 0.15s", minWidth:0, overflow:"hidden", borderLeft:`4px solid ${h.color}`, position:"relative", zIndex:2,
       }}>
-        <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
-          <div style={{ width:"42px", height:"42px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"9px":"12px" }}>{h.abbr}</span>
+        <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+          <div style={{ width:"34px", height:"34px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"8px":"11px" }}>{h.abbr}</span>
           </div>
           <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
             <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
@@ -717,12 +717,12 @@ function MainApp() {
           <div style={{ color:T.textMuted, fontSize:"18px", flexShrink:0 }}>›</div>
         </div>
         {att && (
-          <div style={{ marginTop:"8px", paddingTop:"7px", borderTop:`1px dashed ${T.cardBorder}` }}>
+          <div style={{ marginTop:"5px", paddingTop:"5px", borderTop:`1px dashed ${T.cardBorder}` }}>
             <div style={{ fontSize:"11px", color:T.roleText, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
               <span style={{ fontWeight:700, color:T.text }}>Attending</span> · {att}
             </div>
             {res && (
-              <div style={{ fontSize:"11px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+              <div style={{ fontSize:"11px", color:T.roleText, marginTop:"1px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                 <span style={{ fontWeight:700, color:T.text }}>Resident</span> · {res}
               </div>
             )}
@@ -791,17 +791,17 @@ function MainApp() {
           </div>
 
           <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto" }}>
-            <div style={{ display:"flex", flexDirection:"column", gap:"16px" }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
               {pairRows.map((row, i) => (
                 <div key={i}>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
                     {row.map(h => <Card key={h.id} h={h}/>)}
                   </div>
-                  <div style={{ height:"1px", background:T.cardBorder, margin:"16px 28px 0" }} />
+                  <div style={{ height:"1px", background:T.cardBorder, margin:"10px 28px 0" }} />
                 </div>
               ))}
             </div>
-            <div style={{ marginTop:"16px" }}><Card h={gmh}/></div>
+            <div style={{ marginTop:"10px" }}><Card h={gmh}/></div>
 
             <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}` }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
