@@ -447,6 +447,13 @@ const fetchSchedule = async () => {
 };
 
 const getDayName = () => ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()];
+// Which day's on-call entry covers right now: before 7 AM the previous
+// evening's person is still on shift, so show yesterday's entry.
+const getOnCallDayName = () => {
+  const d = new Date();
+  if (d.getHours() < 7) d.setDate(d.getDate() - 1);
+  return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()];
+};
 const getWeekDates = () => {
   const today = new Date(); const dow = today.getDay();
   let fri = new Date(today); fri.setDate(today.getDate() - (dow >= 5 ? dow - 5 : dow + 2));
@@ -689,22 +696,42 @@ function MainApp() {
     const leftCol = [1,3,2].map(id => HOSPITALS.find(h=>h.id===id));
     const rightCol = [6,4,5].map(id => HOSPITALS.find(h=>h.id===id));
     const gmh = HOSPITALS.find(h=>h.id===7);
-    const Card = ({h}) => (
+    const onCallDay = getOnCallDayName();
+    const previewName = (e) => (e && e.name && e.name !== "N/A" && e.name !== "Weekend Only") ? e.name : null;
+    const Card = ({h}) => {
+      const att = previewName(schedule?.[h.id]?.IR?.[onCallDay]);
+      const res = previewName(schedule?.[h.id]?.Resident?.[onCallDay]);
+      return (
       <div onClick={()=>handleSelectHospital(h.id)} style={{
-        display:"flex", alignItems:"center", gap:"10px", background:T.card, borderRadius:"12px",
-        padding:"14px 12px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
+        background:T.card, borderRadius:"12px",
+        padding:"12px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
         transition:"all 0.15s", minWidth:0, overflow:"hidden", borderLeft:`4px solid ${h.color}`, position:"relative", zIndex:2,
       }}>
-        <div style={{ width:"42px", height:"42px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-          <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"9px":"12px" }}>{h.abbr}</span>
+        <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+          <div style={{ width:"42px", height:"42px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"9px":"12px" }}>{h.abbr}</span>
+          </div>
+          <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
+            <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
+            <div style={{ color:T.textSub, fontSize:"11px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{h.name}</div>
+          </div>
+          <div style={{ color:T.textMuted, fontSize:"18px", flexShrink:0 }}>›</div>
         </div>
-        <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
-          <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
-          <div style={{ color:T.textSub, fontSize:"11px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{h.name}</div>
-        </div>
-        <div style={{ color:T.textMuted, fontSize:"18px", flexShrink:0 }}>›</div>
+        {att && (
+          <div style={{ marginTop:"8px", paddingTop:"7px", borderTop:`1px dashed ${T.cardBorder}` }}>
+            <div style={{ fontSize:"11px", color:T.roleText, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+              <span style={{ fontWeight:700, color:T.text }}>Attending</span> · {att}
+            </div>
+            {res && (
+              <div style={{ fontSize:"11px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                <span style={{ fontWeight:700, color:T.text }}>Resident</span> · {res}
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    );
+      );
+    };
 
     return (
       <div style={{ minHeight:"100vh", background:T.homeBg, backgroundAttachment:"fixed", fontFamily:font, position:"relative", width:"100%", maxWidth:"100vw", overflowX:"hidden" }}>
@@ -836,7 +863,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.8.0
+              IROC v10.9.0
             </div>
 
             <div style={{ height:"30px" }} />
@@ -960,14 +987,15 @@ function MainApp() {
                 const act = effectiveRole === role.key;
                 return (
                   <div key={role.key} onClick={()=>{ setSelectedRole(role.key); logEvent("role", hospital?.abbr || "", role.label); }} style={{
-                    textAlign:"center", padding:"7px 3px", borderRadius:"8px", cursor:"pointer",
+                    display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
+                    minHeight:"38px", padding:"6px 4px", borderRadius:"8px", cursor:"pointer",
                     background: act ? hospital.color : (role.tint && !dk ? role.tint : T.roleBg),
-                    border:`2px solid ${act ? hospital.color : T.roleBorder}`,
+                    border:`1.5px solid ${act ? hospital.color : T.roleBorder}`,
                     color: act ? "#fff" : T.roleText,
                     boxShadow: act ? `0 2px 6px ${hospital.color}40` : "none",
                   }}>
-                    <div style={{ fontSize:"14px" }}>{role.icon}</div>
-                    <div style={{ fontSize:"10px", fontWeight:700, lineHeight:"1.2", marginTop:"1px" }}>{role.label}{role.badge && <span style={{ fontSize:"8px", fontWeight:600, opacity:0.75, display:"block" }}>({role.badge})</span>}</div>
+                    <span style={{ fontSize:"13px", flexShrink:0 }}>{role.icon}</span>
+                    <span style={{ fontSize:"11px", fontWeight:700, lineHeight:"1.15", textAlign:"center" }}>{role.label}{role.badge && <span style={{ fontSize:"8px", fontWeight:600, opacity:0.75, display:"block" }}>({role.badge})</span>}</span>
                   </div>
                 );
               })}
