@@ -97,7 +97,7 @@ const HOSPITALS = [
   { id:2, abbr:"EHH",    name:"Emory Hillandale Hospital",     color:"#4A8A75", address:"https://maps.app.goo.gl/sVgwEnuatMc4urkL7" },
   { id:3, abbr:"EDH",    name:"Emory Decatur Hospital",        color:"#4A8A75", address:"2701 N Decatur Rd, Decatur, GA 30033" },
   { id:4, abbr:"ESJH",   name:"Emory Saint Joseph's Hospital", color:"#B8892E", address:"5665 Peachtree Dunwoody Rd, Atlanta, GA 30342" },
-  { id:5, abbr:"EJCH",   name:"Emory Johns Creek Hospital",    color:"#A8524A", address:"6325 Hospital Pkwy, Johns Creek, GA 30097" },
+  { id:5, abbr:"EJCH",   name:"Emory Johns Creek Hospital",    color:"#B8892E", address:"6325 Hospital Pkwy, Johns Creek, GA 30097" },
   { id:6, abbr:"MT/WEM", name:"Emory Midtown / WEM",           color:"#3D7A8F", address:"550 Peachtree St NE, Atlanta, GA 30308" },
   { id:7, abbr:"GMH",    name:"Grady Memorial Hospital",       color:"#7A5A90", address:"80 Jesse Hill Jr Dr SE, Atlanta, GA 30303" },
 ];
@@ -789,14 +789,17 @@ function MainApp() {
           </div>
 
           <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto" }}>
-            <div style={{ display:"flex", flexDirection:"column", gap:"20px" }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:"16px" }}>
               {pairRows.map((row, i) => (
-                <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
-                  {row.map(h => <Card key={h.id} h={h}/>)}
+                <div key={i}>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
+                    {row.map(h => <Card key={h.id} h={h}/>)}
+                  </div>
+                  <div style={{ height:"1px", background:T.cardBorder, margin:"16px 28px 0" }} />
                 </div>
               ))}
             </div>
-            <div style={{ marginTop:"20px" }}><Card h={gmh}/></div>
+            <div style={{ marginTop:"16px" }}><Card h={gmh}/></div>
 
             <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}` }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
@@ -865,7 +868,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.9.2
+              IROC v10.9.3
             </div>
 
             <div style={{ height:"30px" }} />
