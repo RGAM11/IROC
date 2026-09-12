@@ -832,6 +832,15 @@ function MainApp() {
                 padding:"14px 12px", borderRadius:"12px", textDecoration:"none", marginTop:"8px",
                 background:"linear-gradient(135deg, #2B5797 0%, #1A3A6A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
               }}><span>☁️</span> OneDrive - Call Sign Out</a>
+
+              {/* On-call clinical resources — opens the installed app when
+                  available, otherwise the website */}
+              <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", margin:"16px 0 8px" }}>On-Call Resources</div>
+              <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer" style={{
+                display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
+                padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
+                background:"linear-gradient(135deg, #4A8A75 0%, #2E6B58 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
+              }}><span>🧠</span> OpenEvidence</a>
             </div>
 
             {/* Divider */}
@@ -880,7 +889,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.10.2
+              IROC v10.11.0
             </div>
 
             <div style={{ height:"30px" }} />
