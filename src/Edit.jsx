@@ -222,6 +222,8 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
   const [maintOn, setMaintOn]     = useState(null);  // null=loading, true/false=known
   const [maintBusy, setMaintBusy] = useState(false);
   const [maintErr, setMaintErr]   = useState("");
+  const [repBusy, setRepBusy]     = useState(false);
+  const [repMsg, setRepMsg]       = useState("");
 
   const S = mk(T, dk);
   const page = { position:"fixed", inset:0, zIndex:900, background:T.bg,
@@ -271,6 +273,17 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
       }
     } catch (e) { setMaintErr("Could not reach Apps Script: " + e.message); }
     setMaintBusy(false);
+  };
+
+  const emailReport = async () => {
+    setRepBusy(true); setRepMsg("");
+    try {
+      const d = await jsonp(endpoint, { mode:"report", code: adminCode });
+      setRepMsg(d && d.ok
+        ? "✓ Report sent — check your email"
+        : ((d && d.error) || "Not available — the Apps Script needs the report snippet."));
+    } catch (e) { setRepMsg("Could not reach the script: " + e.message); }
+    setRepBusy(false);
   };
 
   const names = (k) => (staff?.[k] || []).map(x=>x.name).filter(Boolean);
@@ -412,6 +425,20 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
             </div>
           )}
         </div>
+
+        {/* ── On-demand usage report ── */}
+        <div onClick={!repBusy ? emailReport : undefined}
+          style={{ marginBottom:"6px", padding:"12px", borderRadius:"12px", textAlign:"center",
+            background: dk ? "#1A2332" : "#fff", border:`1.5px solid ${T.cardBorder}`,
+            color:T.text, fontWeight:700, fontSize:"13px",
+            cursor: repBusy ? "default" : "pointer", opacity: repBusy ? 0.6 : 1 }}>
+          {repBusy ? "Sending…" : "📊 Email me the usage report"}
+        </div>
+        {repMsg && (
+          <div style={{ fontSize:"11px", textAlign:"center", marginBottom:"8px",
+            color: repMsg.startsWith("✓") ? "#2A9D5A" : "#C0392B" }}>{repMsg}</div>
+        )}
+        <div style={{ marginBottom:"8px" }} />
 
         <div style={{ fontSize:"10px", fontWeight:800, letterSpacing:"1px", color:T.textMuted,
           textTransform:"uppercase", margin:"6px 0 10px" }}>Tap a site to edit</div>

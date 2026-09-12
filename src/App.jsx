@@ -639,11 +639,12 @@ function MainApp() {
     else setSelectedHospital(null);
   };
 
-  // Update browser status bar color to match selected hospital
+  // Update browser status bar color: hospital color on detail pages; on the
+  // home screen match the theme background (light or dark) exactly.
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", hospital ? hospital.color : "#3D7A8F");
-  }, [selectedHospital]);
+    if (meta) meta.setAttribute("content", hospital ? hospital.color : (dk ? "#26496B" : "#CEDCE8"));
+  }, [selectedHospital, theme]);
 
   const weekDates = getWeekDates();
   const todayName = getDayName();
@@ -775,7 +776,7 @@ function MainApp() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          <div style={{ paddingTop:"40px", textAlign:"center", position:"relative", zIndex:1 }}>
+          <div style={{ paddingTop:"22px", textAlign:"center", position:"relative", zIndex:1 }}>
             <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
@@ -870,7 +871,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.9.5
+              IROC v10.10.0
             </div>
 
             <div style={{ height:"30px" }} />
