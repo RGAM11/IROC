@@ -833,14 +833,30 @@ function MainApp() {
                 background:"linear-gradient(135deg, #2B5797 0%, #1A3A6A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
               }}><span>☁️</span> OneDrive - Call Sign Out</a>
 
-              {/* On-call clinical resources — opens the installed app when
-                  available, otherwise the website */}
+              {/* On-call clinical resources — open the installed app when
+                  available, otherwise the store/website */}
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", margin:"16px 0 8px" }}>On-Call Resources</div>
-              <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer" style={{
-                display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
-                padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
-                background:"linear-gradient(135deg, #4A8A75 0%, #2E6B58 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
-              }}><span>🧠</span> OpenEvidence</a>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
+                <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer" style={{
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
+                  padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
+                  background:"linear-gradient(135deg, #4A8A75 0%, #2E6B58 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
+                }}><span>🧠</span> OpenEvidence</a>
+                <div onClick={()=>{
+                  const ua = navigator.userAgent || "";
+                  if (/android/i.test(ua)) {
+                    window.location.href = "intent://open/#Intent;package=org.sirweb.guidelines;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dorg.sirweb.guidelines;end";
+                  } else if (/iphone|ipad|ipod/i.test(ua)) {
+                    window.location.href = "https://apps.apple.com/us/app/sir-guidelines/id1552455529";
+                  } else {
+                    window.open("https://www.sirweb.org/practice-resources/clinical-practice/guidelines-and-statements/", "_blank");
+                  }
+                }} style={{
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
+                  padding:"14px 12px", borderRadius:"12px", cursor:"pointer",
+                  background:"linear-gradient(135deg, #5A7A9E 0%, #3A567A 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
+                }}><span>📚</span> SIR Guidelines</div>
+              </div>
             </div>
 
             {/* Divider */}
@@ -889,7 +905,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.11.0
+              IROC v10.11.1
             </div>
 
             <div style={{ height:"30px" }} />
