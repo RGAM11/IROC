@@ -616,7 +616,12 @@ function MainApp() {
   const [suggestion, setSuggestion] = useState("");
   const [sugStatus, setSugStatus] = useState("idle"); // idle | sending | sent | error
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState("light");
+  // Theme: remembered choice first, else follow the phone's dark mode.
+  const [theme, setTheme] = useState(() => {
+    try { const s = localStorage.getItem("iroc_theme"); if (s === "dark" || s === "light") return s; } catch (e) {}
+    try { if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark"; } catch (e) {}
+    return "light";
+  });
   const [menuOpen, setMenuOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -640,10 +645,14 @@ function MainApp() {
   };
 
   // Update browser status bar color: hospital color on detail pages; on the
-  // home screen match the theme background (light or dark) exactly.
+  // home screen match the theme background. Both meta tags (light/dark media)
+  // are updated so browsers that only honor static declarations still show
+  // the right color for the phone's system theme.
   useEffect(() => {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", hospital ? hospital.color : (dk ? "#26496B" : "#CEDCE8"));
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      const darkMeta = (m.getAttribute("media") || "").indexOf("dark") >= 0;
+      m.setAttribute("content", hospital ? hospital.color : (darkMeta ? "#26496B" : "#CEDCE8"));
+    });
   }, [selectedHospital, theme]);
 
   const weekDates = getWeekDates();
@@ -765,7 +774,7 @@ function MainApp() {
                     borderBottom:`1px solid ${T.cardBorder}` }}>
                   🔒 Scheduler Login
                 </div>
-                <div onClick={()=>{ setTheme(dk ? "light" : "dark"); setMenuOpen(false); }}
+                <div onClick={()=>{ const nt = dk ? "light" : "dark"; setTheme(nt); try { localStorage.setItem("iroc_theme", nt); } catch (e) {} setMenuOpen(false); }}
                   style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
                     color:T.text, fontWeight:600, fontSize:"13px", cursor:"pointer" }}>
                   {dk ? "☀️ Light mode" : "🌙 Dark mode"}
@@ -871,7 +880,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.10.1
+              IROC v10.10.2
             </div>
 
             <div style={{ height:"30px" }} />
