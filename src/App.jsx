@@ -742,7 +742,7 @@ function MainApp() {
         )}
 
         {/* ── top-right menu — level with the IROC title, not selectable ── */}
-        <div style={{ position:"absolute", top:"58px", right:"14px", zIndex:50,
+        <div style={{ position:"absolute", top:"14px", right:"14px", zIndex:50,
           userSelect:"none", WebkitUserSelect:"none", WebkitTouchCallout:"none",
           WebkitTapHighlightColor:"transparent" }}>
           <div onClick={()=>setMenuOpen(o=>!o)}
@@ -871,7 +871,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.10.0
+              IROC v10.10.1
             </div>
 
             <div style={{ height:"30px" }} />
