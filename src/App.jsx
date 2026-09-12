@@ -813,9 +813,9 @@ function MainApp() {
             </div>
             <div style={{ marginTop:"10px" }}><Card h={gmh}/></div>
 
-            <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}` }}>
+            <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}`, display:"flex", flexDirection:"column" }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginTop:"8px", order:2 }}>
                 <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
@@ -827,7 +827,7 @@ function MainApp() {
                   background:"linear-gradient(135deg, #C5DDE9 0%, #9CC5E0 100%)", color:"#2A4A5F", fontWeight:700, fontSize:"13px",
                 }}><span>📄</span> Blank Consent</a>
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px", marginTop:"8px" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px", order:1 }}>
               <a href="https://login.microsoftonline.com/e004fb9c-b0a4-424f-bcd0-322606d5df38/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&ear%5Fjwe%5Fcrypto=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImFwdiI6IkFBQUFDVVZoY2tOc2FXVnVkR2dBQUFCRlEwc3pNQUFBQUpJR1lzbStJSjVEMU5TbU5HL3RwYWh5bTZqVXlWNVpFZmozR3RXK0FrMStRditkTGlGdzNKc25TcEhHZk9WTXVLeEJsTFNqUExhd1lIQTI5ayt0QndOYmE1dmlLM2ozTnpxR0JubUViMXNXcEttTTlXa2J4ZjAzTlNEaHFDZUdjZ0FBQUJoeU9wMy8zSEdkbVRDcVV2eGRsR1VWcUFOQythN0VmUFk9In0%3D&ear%5Fjwk=eyJhbGciOiJFQ0RILUVTIiwiY3J2IjoiUC0zODQiLCJ4IjoiQUFBQU1KSUdZc20rSUo1RDFOU21ORy90cGFoeW02alV5VjVaRWZqM0d0VytBazErUXYrZExpRnczSnNuU3BIR2ZPVk11QT09IiwieSI6IkFBQUFNS3hCbExTalBMYXdZSEEyOWsrdEJ3TmJhNXZpSzNqM056cUdCbm1FYjFzV3BLbU05V2tieGYwM05TRGhxQ2VHY2c9PSIsImt0eSI6IkVDIn0%3D&spa%5Fclient%5Fid=08e18876%2D6177%2D487e%2Db8b5%2Dcf950c1e598c&client%5Finfo=1&response%5Ftype=code%20id%5Ftoken%20spa%5Frt&resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&scope=openid&nonce=4AE8661AA7463540F6A9B6325A39CFF8901F255A95BC6DE7%2D9494BA717D411087C1C45D5C24BCF455BDD924B4D04EE6C063C575BBF63EB244&redirect%5Furi=https%3A%2F%2Femory%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&state=OD0wJjMyPUFBTDRuQUFBQUJRNzI4MlFkU1lLamZBU0pYSiUyRmI4aVo4VzV2aGhhJTJGRzE2R2NvVkh1YU84c05pZlRrYmtid1Qza2hibkNHSCUyQnlGUDc4WkNLaDZtMVpLaVlCVkpaNCUyRnhOZ3lJMTF5RUIyRTJDM1hrS25lOTdNbXFiU1ZKSVFTVXlEaFBiaThiWnNlVEE4YXd4OTB4YXdwYVBlNyUyQk1FWXVseVlDN3hBY3dYQjVCZ2x2N1UwV3dJVyUyQkJRWkRhY0tCam5jZDR1RkolMkZWazhUSlJVOUN6Q0NOUndKbDBMbUJINGwyUCUyQnJJeGNTbmxNOFhHaVlDNEprJTJGbUg5R2NOUXFWZlFqcXBKOUlwYnFYT3FhalZrcE05WXJwUnhpT1dwQVBzTXNzYU4yOFJKJTJGd3l5UVA4N3cyVVB2WWk3Q3JPczJSTDlObTV0JTJGNHNnUWw4czBpbXBRSzE0Z1JzMzJsMFNEOURqNGlMYjlNdCUyRk9tNzFCamh4RDNCMlExdDE4bU1yMW4wTkNJayUzRA&claims=%7B%22id%5Ftoken%22%3A%7B%22xms%5Fcc%22%3A%7B%22values%22%3A%5B%22CP1%22%5D%7D%7D%7D&wsucxt=1&cobrandid=11bd8083%2D87e0%2D41b5%2Dbb78%2D0bc43c8a8e8a&client%2Drequest%2Did=57b818a2%2Db001%2D8000%2D10c8%2Da79f04538046&sso_reload=true" target="_blank" rel="noopener noreferrer" style={{
                 display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"6px",
                 padding:"10px 4px", borderRadius:"12px", textDecoration:"none",
@@ -911,7 +911,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.11.2
+              IROC v10.11.3
             </div>
 
             <div style={{ height:"30px" }} />
