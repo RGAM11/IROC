@@ -95,13 +95,37 @@ const getDeviceId = () => {
   } catch (e) { return "na"; }
 };
 
+const LOG_QUEUE_KEY = "iroc_logq";
+const sendLog = (qs) => fetch(`${SUGGESTION_ENDPOINT}?${qs}&t=${Date.now()}`, { method: "GET", mode: "no-cors", cache: "no-store" });
 const logEvent = (ev, hospital = "", role = "") => {
   try {
-    const url = `${SUGGESTION_ENDPOINT}?log=1&ev=${encodeURIComponent(ev)}`
+    const qs = `log=1&ev=${encodeURIComponent(ev)}`
       + `&h=${encodeURIComponent(hospital)}&r=${encodeURIComponent(role)}`
-      + `&d=${encodeURIComponent(getDeviceId())}&t=${Date.now()}`;
-    fetch(url, { method: "GET", mode: "no-cors", cache: "no-store" }).catch(() => {});
+      + `&d=${encodeURIComponent(getDeviceId())}`;
+    // offline: keep it and send on the next open (server stamps arrival time)
+    sendLog(qs).catch(() => {
+      try {
+        const q = JSON.parse(localStorage.getItem(LOG_QUEUE_KEY) || "[]");
+        q.push(qs); localStorage.setItem(LOG_QUEUE_KEY, JSON.stringify(q.slice(-50)));
+      } catch (e) {}
+    });
   } catch (e) { /* logging must never break the app */ }
+};
+const flushLogQueue = () => {
+  try {
+    const q = JSON.parse(localStorage.getItem(LOG_QUEUE_KEY) || "[]");
+    if (!q.length) return;
+    localStorage.removeItem(LOG_QUEUE_KEY);
+    q.forEach(qs => sendLog(qs).catch(() => {}));
+  } catch (e) {}
+};
+// Platform + whether it's installed on the home screen; logged with "open".
+const platformInfo = () => {
+  const ua = navigator.userAgent || "";
+  const os = /iphone|ipad|ipod/i.test(ua) ? "iOS" : /android/i.test(ua) ? "Android" : "Other";
+  let installed = false;
+  try { installed = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || !!navigator.standalone; } catch (e) {}
+  return { os, mode: installed ? "installed" : "browser" };
 };
 
 const DAYS = ["Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
@@ -492,7 +516,10 @@ const fetchSchedule = async () => {
     try { parseMTWEMTab(mtwem, data); } catch(e) { console.error("MTWEM parse error:", e); }
     try { parseESJHEJCHTab(esjhejch, data); } catch(e) { console.error("ESJH-EJCH parse error:", e); }
     try { parseGMHTab(gmh, data); } catch(e) { console.error("GMH parse error:", e); }
-  } catch(e) { console.error("CSV fetch error:", e); }
+  } catch(e) {
+    console.error("CSV fetch error:", e);
+    logEvent("loadfail", "", (typeof navigator !== "undefined" && navigator.onLine === false) ? "offline" : "error");
+  }
   return data;
 };
 
@@ -583,7 +610,7 @@ function TieLineDialer({ tieLines, T, color }) {
             }} />
         </div>
         {full && (
-          <a href={`tel:${full}`} style={{
+          <a href={`tel:${full}`} onClick={()=>logEvent("call", "", "Tie line")} style={{
             flex:1, display:"flex", alignItems:"center", justifyContent:"center",
             padding:"8px 6px", borderRadius:"8px", background:color, color:"#fff",
             textDecoration:"none", fontWeight:700, fontSize:"12px", textAlign:"center",
@@ -680,7 +707,7 @@ function MainApp() {
   const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => { fetchSchedule().then(d => setSchedule(d)).finally(() => setLoading(false)); }, []);
-  useEffect(() => { logEvent("open"); }, []);
+  useEffect(() => { const p = platformInfo(); logEvent("open", p.os, p.mode); flushLogQueue(); }, []);
 
   // Android/iOS back button: navigate within app instead of exiting.
   // When a hospital is opened we push a history entry; the phone back button
@@ -878,13 +905,13 @@ function MainApp() {
                   const url = `${SUGGESTION_ENDPOINT}?s=${encodeURIComponent(text)}&t=${Date.now()}`;
                   try {
                     await fetch(url, { method:"GET", mode:"no-cors", cache:"no-store", redirect:"follow" });
-                    setSugStatus("sent"); setSuggestion("");
+                    setSugStatus("sent"); setSuggestion(""); logEvent("suggest");
                   } catch(e) {
                     // Fallback: image beacon — can't be blocked by CORS
                     try {
                       const img = new Image();
                       img.src = url;
-                      setSugStatus("sent"); setSuggestion("");
+                      setSugStatus("sent"); setSuggestion(""); logEvent("suggest");
                     } catch(e2) { setSugStatus("error"); }
                   }
                 }}
@@ -933,19 +960,19 @@ function MainApp() {
             <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}`, display:"flex", flexDirection:"column" }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginTop:"8px", order:2 }}>
-                <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" style={{
+                <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "EHConnect")} style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
                   background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
                 }}><span>🔗</span> EHConnect</a>
-                <a href="https://www.emoryhealthcare.org/-/media/Project/EH/Emory/ui/pdfs/ejch-physician-forms/2018-Consent-to-Medical-or-Surgical-Treatment.pdf" target="_blank" rel="noopener noreferrer" style={{
+                <a href="https://www.emoryhealthcare.org/-/media/Project/EH/Emory/ui/pdfs/ejch-physician-forms/2018-Consent-to-Medical-or-Surgical-Treatment.pdf" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "Blank Consent")} style={{
                   display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
                   background:"linear-gradient(135deg, #C5DDE9 0%, #9CC5E0 100%)", color:"#2A4A5F", fontWeight:700, fontSize:"13px",
                 }}><span>📄</span> Blank Consent</a>
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px", order:1 }}>
-              <a href="https://login.microsoftonline.com/e004fb9c-b0a4-424f-bcd0-322606d5df38/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&ear%5Fjwe%5Fcrypto=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImFwdiI6IkFBQUFDVVZoY2tOc2FXVnVkR2dBQUFCRlEwc3pNQUFBQUpJR1lzbStJSjVEMU5TbU5HL3RwYWh5bTZqVXlWNVpFZmozR3RXK0FrMStRditkTGlGdzNKc25TcEhHZk9WTXVLeEJsTFNqUExhd1lIQTI5ayt0QndOYmE1dmlLM2ozTnpxR0JubUViMXNXcEttTTlXa2J4ZjAzTlNEaHFDZUdjZ0FBQUJoeU9wMy8zSEdkbVRDcVV2eGRsR1VWcUFOQythN0VmUFk9In0%3D&ear%5Fjwk=eyJhbGciOiJFQ0RILUVTIiwiY3J2IjoiUC0zODQiLCJ4IjoiQUFBQU1KSUdZc20rSUo1RDFOU21ORy90cGFoeW02alV5VjVaRWZqM0d0VytBazErUXYrZExpRnczSnNuU3BIR2ZPVk11QT09IiwieSI6IkFBQUFNS3hCbExTalBMYXdZSEEyOWsrdEJ3TmJhNXZpSzNqM056cUdCbm1FYjFzV3BLbU05V2tieGYwM05TRGhxQ2VHY2c9PSIsImt0eSI6IkVDIn0%3D&spa%5Fclient%5Fid=08e18876%2D6177%2D487e%2Db8b5%2Dcf950c1e598c&client%5Finfo=1&response%5Ftype=code%20id%5Ftoken%20spa%5Frt&resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&scope=openid&nonce=4AE8661AA7463540F6A9B6325A39CFF8901F255A95BC6DE7%2D9494BA717D411087C1C45D5C24BCF455BDD924B4D04EE6C063C575BBF63EB244&redirect%5Furi=https%3A%2F%2Femory%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&state=OD0wJjMyPUFBTDRuQUFBQUJRNzI4MlFkU1lLamZBU0pYSiUyRmI4aVo4VzV2aGhhJTJGRzE2R2NvVkh1YU84c05pZlRrYmtid1Qza2hibkNHSCUyQnlGUDc4WkNLaDZtMVpLaVlCVkpaNCUyRnhOZ3lJMTF5RUIyRTJDM1hrS25lOTdNbXFiU1ZKSVFTVXlEaFBiaThiWnNlVEE4YXd4OTB4YXdwYVBlNyUyQk1FWXVseVlDN3hBY3dYQjVCZ2x2N1UwV3dJVyUyQkJRWkRhY0tCam5jZDR1RkolMkZWazhUSlJVOUN6Q0NOUndKbDBMbUJINGwyUCUyQnJJeGNTbmxNOFhHaVlDNEprJTJGbUg5R2NOUXFWZlFqcXBKOUlwYnFYT3FhalZrcE05WXJwUnhpT1dwQVBzTXNzYU4yOFJKJTJGd3l5UVA4N3cyVVB2WWk3Q3JPczJSTDlObTV0JTJGNHNnUWw4czBpbXBRSzE0Z1JzMzJsMFNEOURqNGlMYjlNdCUyRk9tNzFCamh4RDNCMlExdDE4bU1yMW4wTkNJayUzRA&claims=%7B%22id%5Ftoken%22%3A%7B%22xms%5Fcc%22%3A%7B%22values%22%3A%5B%22CP1%22%5D%7D%7D%7D&wsucxt=1&cobrandid=11bd8083%2D87e0%2D41b5%2Dbb78%2D0bc43c8a8e8a&client%2Drequest%2Did=57b818a2%2Db001%2D8000%2D10c8%2Da79f04538046&sso_reload=true" target="_blank" rel="noopener noreferrer" style={{
+              <a href="https://login.microsoftonline.com/e004fb9c-b0a4-424f-bcd0-322606d5df38/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&ear%5Fjwe%5Fcrypto=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImFwdiI6IkFBQUFDVVZoY2tOc2FXVnVkR2dBQUFCRlEwc3pNQUFBQUpJR1lzbStJSjVEMU5TbU5HL3RwYWh5bTZqVXlWNVpFZmozR3RXK0FrMStRditkTGlGdzNKc25TcEhHZk9WTXVLeEJsTFNqUExhd1lIQTI5ayt0QndOYmE1dmlLM2ozTnpxR0JubUViMXNXcEttTTlXa2J4ZjAzTlNEaHFDZUdjZ0FBQUJoeU9wMy8zSEdkbVRDcVV2eGRsR1VWcUFOQythN0VmUFk9In0%3D&ear%5Fjwk=eyJhbGciOiJFQ0RILUVTIiwiY3J2IjoiUC0zODQiLCJ4IjoiQUFBQU1KSUdZc20rSUo1RDFOU21ORy90cGFoeW02alV5VjVaRWZqM0d0VytBazErUXYrZExpRnczSnNuU3BIR2ZPVk11QT09IiwieSI6IkFBQUFNS3hCbExTalBMYXdZSEEyOWsrdEJ3TmJhNXZpSzNqM056cUdCbm1FYjFzV3BLbU05V2tieGYwM05TRGhxQ2VHY2c9PSIsImt0eSI6IkVDIn0%3D&spa%5Fclient%5Fid=08e18876%2D6177%2D487e%2Db8b5%2Dcf950c1e598c&client%5Finfo=1&response%5Ftype=code%20id%5Ftoken%20spa%5Frt&resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&scope=openid&nonce=4AE8661AA7463540F6A9B6325A39CFF8901F255A95BC6DE7%2D9494BA717D411087C1C45D5C24BCF455BDD924B4D04EE6C063C575BBF63EB244&redirect%5Furi=https%3A%2F%2Femory%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&state=OD0wJjMyPUFBTDRuQUFBQUJRNzI4MlFkU1lLamZBU0pYSiUyRmI4aVo4VzV2aGhhJTJGRzE2R2NvVkh1YU84c05pZlRrYmtid1Qza2hibkNHSCUyQnlGUDc4WkNLaDZtMVpLaVlCVkpaNCUyRnhOZ3lJMTF5RUIyRTJDM1hrS25lOTdNbXFiU1ZKSVFTVXlEaFBiaThiWnNlVEE4YXd4OTB4YXdwYVBlNyUyQk1FWXVseVlDN3hBY3dYQjVCZ2x2N1UwV3dJVyUyQkJRWkRhY0tCam5jZDR1RkolMkZWazhUSlJVOUN6Q0NOUndKbDBMbUJINGwyUCUyQnJJeGNTbmxNOFhHaVlDNEprJTJGbUg5R2NOUXFWZlFqcXBKOUlwYnFYT3FhalZrcE05WXJwUnhpT1dwQVBzTXNzYU4yOFJKJTJGd3l5UVA4N3cyVVB2WWk3Q3JPczJSTDlObTV0JTJGNHNnUWw4czBpbXBRSzE0Z1JzMzJsMFNEOURqNGlMYjlNdCUyRk9tNzFCamh4RDNCMlExdDE4bU1yMW4wTkNJayUzRA&claims=%7B%22id%5Ftoken%22%3A%7B%22xms%5Fcc%22%3A%7B%22values%22%3A%5B%22CP1%22%5D%7D%7D%7D&wsucxt=1&cobrandid=11bd8083%2D87e0%2D41b5%2Dbb78%2D0bc43c8a8e8a&client%2Drequest%2Did=57b818a2%2Db001%2D8000%2D10c8%2Da79f04538046&sso_reload=true" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "OneDrive")} style={{
                 display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"6px",
                 padding:"10px 4px", borderRadius:"12px", textDecoration:"none",
                 background:T.card, border:`1px solid ${T.cardBorder}`,
@@ -955,6 +982,7 @@ function MainApp() {
               </a>
 
                 <div onClick={()=>{
+                  logEvent("link", "", "SIR Guidelines");
                   const ua = navigator.userAgent || "";
                   if (/android/i.test(ua)) {
                     window.location.href = "intent://open/#Intent;package=org.sirweb.guidelines;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dorg.sirweb.guidelines;end";
@@ -971,7 +999,7 @@ function MainApp() {
                   <img src="/sir-icon.png" alt="" style={{ width:"30px", height:"30px" }} />
                   <span style={{ fontSize:"10px", fontWeight:700, color:T.text, textAlign:"center", lineHeight:1.2 }}>SIR Guidelines</span>
                 </div>
-                <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer" style={{
+                <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "OpenEvidence")} style={{
                   display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"6px",
                   padding:"10px 4px", borderRadius:"12px", textDecoration:"none",
                   background:T.card, border:`1px solid ${T.cardBorder}`,
@@ -983,7 +1011,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.12.3
+              IROC v10.13.0
             </div>
 
             <div style={{ height:"30px" }} />
@@ -1151,7 +1179,7 @@ function MainApp() {
               {activeRole.note && <div style={{ fontSize:"14px", color: dk ? "#D4A84A" : "#8A6D2A", marginTop:"8px", whiteSpace:"pre-line" }}>⚠️ {activeRole.note}</div>}
               {activeRole.image && <ZoomImage src={activeRole.image} alt={activeRole.label} color={hospital.color} T={T} />}
               {activeRole.link && (
-                <a href={activeRole.link} target="_blank" rel="noopener noreferrer" style={{
+                <a href={activeRole.link} target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", hospital?.abbr || "", activeRole.linkLabel || "Link")} style={{
                   display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"8px",
                   padding:"8px 16px", borderRadius:"8px", textDecoration:"none",
                   background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"12px",
@@ -1162,7 +1190,7 @@ function MainApp() {
                 <div key={i} style={{ paddingTop: i > 0 ? "8px" : "4px", paddingBottom:"8px", borderBottom: `1px solid ${T.dayBorder}` }}>
                   <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
                     <div style={{ flex:1, fontSize:"15px", fontWeight:700, color:T.text }}>{n.label}</div>
-                    <a href={`tel:${n.phone.replace(/[^0-9]/g,"")}`} style={{
+                    <a href={`tel:${n.phone.replace(/[^0-9]/g,"")}`} onClick={()=>logEvent("call", hospital?.abbr || "", n.label || "Other number")} style={{
                       flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:"4px",
                       padding:"8px 0", borderRadius:"8px", background:hospital.color, color:"#fff",
                       textDecoration:"none", fontSize:"13px", fontWeight:700,
@@ -1236,7 +1264,7 @@ function MainApp() {
                           </>
                         )}
                         {sub.weekdayLink && !isWeekendDay && selectedDay !== "Friday" && (
-                          <a href={sub.weekdayLink} target="_blank" rel="noopener noreferrer" style={{
+                          <a href={sub.weekdayLink} target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", hospital?.abbr || "", sub.weekdayLinkLabel || "EHConnect")} style={{
                             display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"4px",
                             padding:"6px 12px", borderRadius:"6px", textDecoration:"none",
                             background:"linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)", color:"#fff", fontWeight:700, fontSize:"11px",
@@ -1246,7 +1274,7 @@ function MainApp() {
                     ) : (
                       <div style={{ textAlign:"center" }}>
                         {sub.weekdayLink && !isWeekendDay && selectedDay !== "Friday" ? (
-                          <a href={sub.weekdayLink} target="_blank" rel="noopener noreferrer" style={{
+                          <a href={sub.weekdayLink} target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", hospital?.abbr || "", sub.weekdayLinkLabel || "EHConnect")} style={{
                             display:"inline-flex", alignItems:"center", gap:"5px",
                             padding:"6px 12px", borderRadius:"6px", textDecoration:"none",
                             background:"linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)", color:"#fff", fontWeight:700, fontSize:"11px",
@@ -1284,7 +1312,7 @@ function MainApp() {
                   <div style={{ fontSize:"16px", fontWeight:700, color:T.text }}>{todayEntry.name}{todayEntry.phone ? <span style={{ fontWeight:500, fontSize:"13px", color:T.textSub }}> · 📞 {todayEntry.phone}</span> : ""}</div>
                   <PhoneButtons phone={todayEntry.phone} clr={hospital.color} />
                   {activeRole?.weekdayLink && !isWeekendDay && selectedDay !== "Friday" && (
-                    <a href={activeRole.weekdayLink} target="_blank" rel="noopener noreferrer" style={{
+                    <a href={activeRole.weekdayLink} target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", hospital?.abbr || "", activeRole.weekdayLinkLabel || "EHConnect")} style={{
                       display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"8px",
                       padding:"8px 16px", borderRadius:"8px", textDecoration:"none",
                       background:`linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)`, color:"#fff", fontWeight:700, fontSize:"12px",
@@ -1305,7 +1333,7 @@ function MainApp() {
                 {todayEntry?.name === "Weekend Only" ? "Weekend Only — no weekday schedule for this role" : "No one scheduled"}
               </div>
               {activeRole?.weekdayLink && !isWeekendDay && selectedDay !== "Friday" && (
-                <a href={activeRole.weekdayLink} target="_blank" rel="noopener noreferrer" style={{
+                <a href={activeRole.weekdayLink} target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", hospital?.abbr || "", activeRole.weekdayLinkLabel || "EHConnect")} style={{
                   display:"inline-flex", alignItems:"center", gap:"5px", marginTop:"10px",
                   padding:"8px 16px", borderRadius:"8px", textDecoration:"none",
                   background:`linear-gradient(135deg, #4A6FA0 0%, #2B4A7A 100%)`, color:"#fff", fontWeight:700, fontSize:"12px",

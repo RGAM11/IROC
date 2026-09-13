@@ -68,6 +68,15 @@ export const postJson = async (base, payloadObj) => {
 };
 
 const DAYS = ["Friday","Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday"];
+
+// Anonymous "edit" event so the usage report can flag sites not saved this week.
+const logEdit = (endpoint, what) => {
+  try {
+    let d = "na"; try { d = localStorage.getItem("iroc_did") || "na"; } catch (e) {}
+    fetch(`${endpoint}?log=1&ev=edit&h=${encodeURIComponent(what)}&r=&d=${encodeURIComponent(d)}&t=${Date.now()}`,
+      { method:"GET", mode:"no-cors", cache:"no-store" }).catch(() => {});
+  } catch (e) {}
+};
 const WEEKDAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
 const WEEKEND = ["Saturday","Sunday"];
 
@@ -422,6 +431,7 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
         hospital: hosp.k, fields: { ...rest, banner, otherNumbers: tabNums } });
       if (r && r.ok) {
         setSavedAt(new Date().toLocaleTimeString());
+        logEdit(endpoint, hosp.k === "MTWEM" ? "MT/WEM" : hosp.k);
         // Write the save back into the login-time snapshot, otherwise
         // re-opening this hospital rebuilds the form from stale data and the
         // just-saved names appear to revert.
@@ -442,7 +452,7 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
     setBusy(true); setErr("");
     try {
       const r = await postJson(endpoint, { mode:"staff", code:clean(), ...staff });
-      if (r && r.ok) setSavedAt(new Date().toLocaleTimeString());
+      if (r && r.ok) { setSavedAt(new Date().toLocaleTimeString()); logEdit(endpoint, "Staff"); }
       else setErr((r && r.error) || "Save failed.");
     } catch (e) { setErr("Save failed: " + e.message); }
     setBusy(false);
