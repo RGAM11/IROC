@@ -88,10 +88,21 @@ const TABKEY = { "EUH":"EUH", "EHH-EDH":"EHHEDH", "MTWEM":"MTWEM", "ESJH-EJCH":"
 const SHARED_TABS = { "ESJH-EJCH":true, "EHH-EDH":true };
 const NUM_TAG = /^(EHH|EDH|ESJH|EJCH)\|/;
 const numsForHosp = (all, k) => (all || [])
-  .filter(n => { const m = NUM_TAG.exec(n.label || ""); return !m || m[1] === k; })
-  .map(n => ({ ...n, label: (n.label || "").replace(NUM_TAG, "") }));
+  .filter(n => { const m = NUM_TAG.exec(n.name || ""); return !m || m[1] === k; })
+  .map(n => ({ ...n, name: (n.name || "").replace(NUM_TAG, "") }));
 const numsKeepOthers = (all, k) => (all || [])
-  .filter(n => { const m = NUM_TAG.exec(n.label || ""); return m && m[1] !== k; });
+  .filter(n => { const m = NUM_TAG.exec(n.name || ""); return m && m[1] !== k; });
+
+// Physician / resident are stored per day once the Apps Script is v6+.
+// {Friday..Thursday}; a blank day means "same as Friday" (the script fills it).
+const toWeek = (v) => {
+  const w = {};
+  DAYS.forEach(d => { w[d] = ""; });
+  if (v && typeof v === "object") DAYS.forEach(d => { w[d] = v[d] || ""; });
+  else if (v) w.Friday = v;
+  return w;
+};
+const fridayOf = (v) => (v && typeof v === "object") ? (v.Friday || "") : (v || "");
 
 // ═══ Hoisted to module scope. Defining these INSIDE the parent makes React
 // ═══ treat them as new component types on every keystroke, which remounts
@@ -115,6 +126,50 @@ function Picker({ T, dk, label, value, list, onChange }) {
         {list.map(n => <option key={n} value={n}>{n}</option>)}
         {value && !list.includes(value) && <option value={value}>{value}</option>}
       </select>
+    </div>
+  );
+}
+
+/** Friday sets the whole week; any other day can be overridden individually. */
+function WeekPicker({ T, dk, label, week, list, color, onChange }) {
+  const S = mk(T, dk);
+  const w = toWeek(week);
+  const fri = w.Friday;
+  const setFriday = (v) => {
+    const n = { ...w };
+    // days that were blank or followed the old Friday value follow the new one
+    DAYS.forEach(d => { if (d === "Friday" || !w[d] || w[d] === fri) n[d] = v; });
+    onChange(n);
+  };
+  const setDay = (d, v) => onChange({ ...w, [d]: v });
+  const changed = DAYS.filter(d => d !== "Friday" && w[d] && w[d] !== fri).length;
+  return (
+    <div style={{ marginBottom:"12px" }}>
+      <Picker T={T} dk={dk} label={`${label} — Friday (sets the whole week)`} value={fri}
+        list={list} onChange={setFriday} />
+      <div style={{ padding:"10px", background:T.card, border:`1px solid ${T.cardBorder}`,
+        borderRadius:"8px" }}>
+        <div style={{ fontSize:"10px", fontWeight:800, letterSpacing:"1px", textTransform:"uppercase",
+          color:T.textMuted, marginBottom:"8px" }}>
+          Different {label} on a specific day?{changed ? ` · ${changed} changed` : ""}
+        </div>
+        {DAYS.filter(d => d !== "Friday").map(d => {
+          const v = w[d] || fri;
+          const diff = !!(w[d] && w[d] !== fri);
+          return (
+            <div key={d} style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"6px" }}>
+              <div style={{ width:"84px", fontSize:"12px", fontWeight:700,
+                color: diff ? color : T.textMuted }}>{d}{diff ? " ●" : ""}</div>
+              <select value={v} onChange={e=>setDay(d, e.target.value)}
+                style={{...S.inp, marginBottom:0, flex:1, opacity: diff ? 1 : 0.8}}>
+                <option value="">— same as Friday —</option>
+                {list.map(n => <option key={n} value={n}>{n}</option>)}
+                {v && !list.includes(v) && <option value={v}>{v}</option>}
+              </select>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -224,6 +279,7 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
   const [maintErr, setMaintErr]   = useState("");
   const [repBusy, setRepBusy]     = useState(false);
   const [repMsg, setRepMsg]       = useState("");
+  const [scriptV6, setScriptV6]   = useState(false);   // Apps Script supports per-day saves
 
   const S = mk(T, dk);
   const page = { position:"fixed", inset:0, zIndex:900, background:T.bg,
@@ -252,6 +308,7 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
         setBusy(false); return;
       }
       setData(d.data); setStaff(d.data.staff); setAdminCode(c); setStep("list");
+      setScriptV6(Number(d.data.v) >= 6);
       // Fetch maintenance state in background after login
       jsonp(endpoint, { mode: "get_maintenance" })
         .then(r => setMaintOn(!!(r && r.ok && r.maintenance)))
@@ -294,8 +351,13 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
     const d = data[h.k] || {};
     const tk = TABKEY[h.tab];
     const allNums = (data.otherNumbers && data.otherNumbers[tk]) || [];
+    // v6 script: physician/resident are per-day maps. v5: plain strings — never
+    // hand it an object (it would write "[object Object]" into the sheet).
+    const week = (v) => scriptV6 ? toWeek(v) : fridayOf(v);
     return JSON.parse(JSON.stringify({
       ...d,
+      ir: week(d.ir),
+      ...("resident" in d ? { resident: week(d.resident) } : {}),
       banner: (data.banners && data.banners[tk]) || "",
       otherNumbers: SHARED_TABS[h.tab] ? numsForHosp(allNums, h.k) : allNums,
     }));
@@ -319,9 +381,13 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
       // tagged entries through untouched.
       const tabNums = SHARED_TABS[hosp.tab]
         ? [ ...numsKeepOthers((data.otherNumbers && data.otherNumbers[tk]) || [], hosp.k),
-            ...(otherNumbers || []).filter(n => (n.label || n.phone))
-              .map(n => ({ ...n, label: `${hosp.k}|${n.label || ""}` })) ]
+            ...(otherNumbers || []).filter(n => (n.name || n.phone))
+              .map(n => ({ ...n, name: `${hosp.k}|${n.name || ""}` })) ]
         : (otherNumbers || []);
+      if (!scriptV6) {
+        rest.ir = fridayOf(rest.ir);
+        if ("resident" in rest) rest.resident = fridayOf(rest.resident);
+      }
       const r = await postJson(endpoint, { mode:"save", code:clean(),
         hospital: hosp.k, fields: { ...rest, banner, otherNumbers: tabNums } });
       if (r && r.ok) {
@@ -443,7 +509,7 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
         <div style={{ fontSize:"10px", fontWeight:800, letterSpacing:"1px", color:T.textMuted,
           textTransform:"uppercase", margin:"6px 0 10px" }}>Tap a site to edit</div>
         {HOSPS.map(h => {
-          const filled = !!(data[h.k] && data[h.k].ir);
+          const filled = !!(data[h.k] && fridayOf(data[h.k].ir));
           return (
             <div key={h.k} onClick={()=>openHosp(h)}
               style={{ display:"flex", alignItems:"center", gap:"10px", padding:"14px",
@@ -541,12 +607,28 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
         </div>
 
         <Section id="a" title="IR PHYSICIAN + RESIDENT" color="#3D7A8F" open={!!open.a} toggle={toggle}>
-          <Picker T={T} dk={dk} label="IR Physician (all week)" value={form.ir}
-            list={docList} onChange={v=>set("ir", v)} />
-          {(isEUH || isGrid) && (
-            <Picker T={T} dk={dk} label="Resident (all week)" value={form.resident}
-              list={resList} onChange={v=>set("resident", v)} />
-          )}
+          {scriptV6 ? <>
+            <div style={{ fontSize:"11px", color:T.textMuted, marginBottom:"8px" }}>
+              Pick Friday and it applies to the whole week. Change any other day below if someone else covers it.
+            </div>
+            <WeekPicker T={T} dk={dk} label="Attending" week={form.ir} list={docList}
+              color="#3D7A8F" onChange={v=>set("ir", v)} />
+            {(isEUH || isGrid) && (
+              <WeekPicker T={T} dk={dk} label="Resident" week={form.resident} list={resList}
+                color="#7B6BA8" onChange={v=>set("resident", v)} />
+            )}
+          </> : <>
+            <Picker T={T} dk={dk} label="IR Physician (all week)" value={form.ir}
+              list={docList} onChange={v=>set("ir", v)} />
+            {(isEUH || isGrid) && (
+              <Picker T={T} dk={dk} label="Resident (all week)" value={form.resident}
+                list={resList} onChange={v=>set("resident", v)} />
+            )}
+            <div style={{ fontSize:"11px", color:"#C0392B", marginBottom:"8px", lineHeight:1.4 }}>
+              ⚠️ The Apps Script is still the old version: this only writes Friday’s row.
+              Paste the new Code.gs and redeploy to set the attending per day.
+            </div>
+          </>}
         </Section>
 
         {isEUH && <>
