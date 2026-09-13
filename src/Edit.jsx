@@ -104,6 +104,23 @@ const toWeek = (v) => {
 };
 const fridayOf = (v) => (v && typeof v === "object") ? (v.Friday || "") : (v || "");
 
+// On the v5 script only Friday's row can be written, so day-specific
+// attendings/residents ride along as hidden Other Numbers rows
+// ("#att:Monday:Dr. X" / "#res:Monday:Dr. Y") that the app reads back.
+const OVR = /^#(att|res):(Friday|Saturday|Sunday|Monday|Tuesday|Wednesday|Thursday):(.*)$/;
+const splitOverrides = (nums) => {
+  const plain = [], ir = {}, res = {};
+  (nums || []).forEach(n => {
+    const m = OVR.exec(n.name || "");
+    if (!m) { plain.push(n); return; }
+    (m[1] === "att" ? ir : res)[m[2]] = m[3].trim();
+  });
+  return { plain, ir, res };
+};
+const overrideRows = (tag, week, phoneOf) => DAYS
+  .filter(d => d !== "Friday" && week[d] && week[d] !== week.Friday)
+  .map(d => ({ name: `#${tag}:${d}:${week[d]}`, phone: phoneOf(week[d]) }));
+
 // ═══ Hoisted to module scope. Defining these INSIDE the parent makes React
 // ═══ treat them as new component types on every keystroke, which remounts
 // ═══ the input and steals focus after one character.
@@ -344,6 +361,13 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
   };
 
   const names = (k) => (staff?.[k] || []).map(x=>x.name).filter(Boolean);
+  const phoneOf = (name) => {
+    for (const g of ["physicians","residents"]) {
+      const p = (staff?.[g] || []).find(x => x.name === name);
+      if (p && p.phone) return p.phone;
+    }
+    return "";
+  };
   const rnList = names("rns"), techList = names("techs"),
         docList = names("physicians"), resList = names("residents");
 
@@ -351,15 +375,16 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
     const d = data[h.k] || {};
     const tk = TABKEY[h.tab];
     const allNums = (data.otherNumbers && data.otherNumbers[tk]) || [];
-    // v6 script: physician/resident are per-day maps. v5: plain strings — never
-    // hand it an object (it would write "[object Object]" into the sheet).
-    const week = (v) => scriptV6 ? toWeek(v) : fridayOf(v);
+    const { plain, ir: oIr, res: oRes } = splitOverrides(SHARED_TABS[h.tab] ? numsForHosp(allNums, h.k) : allNums);
+    // v6 script: physician/resident arrive as per-day maps. v5: Friday's
+    // string plus any hidden override rows; the rest of the week is Friday.
+    const week = (v, o) => { const w = toWeek(v); if (!scriptV6) Object.keys(o).forEach(day => { w[day] = o[day]; }); return w; };
     return JSON.parse(JSON.stringify({
       ...d,
-      ir: week(d.ir),
-      ...("resident" in d ? { resident: week(d.resident) } : {}),
+      ir: week(d.ir, oIr),
+      ...("resident" in d ? { resident: week(d.resident, oRes) } : {}),
       banner: (data.banners && data.banners[tk]) || "",
-      otherNumbers: SHARED_TABS[h.tab] ? numsForHosp(allNums, h.k) : allNums,
+      otherNumbers: plain,
     }));
   };
   const openHosp = (h) => { setForm(loadForm(h)); setHosp(h); setStep("hosp"); setSavedAt(""); setErr(""); };
@@ -376,18 +401,23 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
     try {
       const tk = TABKEY[hosp.tab];
       const { banner, otherNumbers, ...rest } = form;
+      let nums = (otherNumbers || []).filter(n => (n.name || n.phone));
+      if (!scriptV6) {
+        // v5 writes Friday's row only and would write an object as
+        // "[object Object]": send Friday as a string, days that differ as
+        // hidden override rows.
+        nums = [ ...nums, ...overrideRows("att", toWeek(rest.ir), phoneOf),
+                 ...("resident" in rest ? overrideRows("res", toWeek(rest.resident), phoneOf) : []) ];
+        rest.ir = fridayOf(rest.ir);
+        if ("resident" in rest) rest.resident = fridayOf(rest.resident);
+      }
       // In a shared tab the sheet holds ONE Other Numbers section for the
       // pair, so tag this hospital's entries and carry the other hospital's
       // tagged entries through untouched.
       const tabNums = SHARED_TABS[hosp.tab]
         ? [ ...numsKeepOthers((data.otherNumbers && data.otherNumbers[tk]) || [], hosp.k),
-            ...(otherNumbers || []).filter(n => (n.name || n.phone))
-              .map(n => ({ ...n, name: `${hosp.k}|${n.name || ""}` })) ]
-        : (otherNumbers || []);
-      if (!scriptV6) {
-        rest.ir = fridayOf(rest.ir);
-        if ("resident" in rest) rest.resident = fridayOf(rest.resident);
-      }
+            ...nums.map(n => ({ ...n, name: `${hosp.k}|${n.name || ""}` })) ]
+        : nums;
       const r = await postJson(endpoint, { mode:"save", code:clean(),
         hospital: hosp.k, fields: { ...rest, banner, otherNumbers: tabNums } });
       if (r && r.ok) {
@@ -607,28 +637,15 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
         </div>
 
         <Section id="a" title="IR PHYSICIAN + RESIDENT" color="#3D7A8F" open={!!open.a} toggle={toggle}>
-          {scriptV6 ? <>
-            <div style={{ fontSize:"11px", color:T.textMuted, marginBottom:"8px" }}>
-              Pick Friday and it applies to the whole week. Change any other day below if someone else covers it.
-            </div>
-            <WeekPicker T={T} dk={dk} label="Attending" week={form.ir} list={docList}
-              color="#3D7A8F" onChange={v=>set("ir", v)} />
-            {(isEUH || isGrid) && (
-              <WeekPicker T={T} dk={dk} label="Resident" week={form.resident} list={resList}
-                color="#7B6BA8" onChange={v=>set("resident", v)} />
-            )}
-          </> : <>
-            <Picker T={T} dk={dk} label="IR Physician (all week)" value={form.ir}
-              list={docList} onChange={v=>set("ir", v)} />
-            {(isEUH || isGrid) && (
-              <Picker T={T} dk={dk} label="Resident (all week)" value={form.resident}
-                list={resList} onChange={v=>set("resident", v)} />
-            )}
-            <div style={{ fontSize:"11px", color:"#C0392B", marginBottom:"8px", lineHeight:1.4 }}>
-              ⚠️ The Apps Script is still the old version: this only writes Friday’s row.
-              Paste the new Code.gs and redeploy to set the attending per day.
-            </div>
-          </>}
+          <div style={{ fontSize:"11px", color:T.textMuted, marginBottom:"8px" }}>
+            Pick Friday and it applies to the whole week. Change any other day below if someone else covers it.
+          </div>
+          <WeekPicker T={T} dk={dk} label="Attending" week={form.ir} list={docList}
+            color="#3D7A8F" onChange={v=>set("ir", v)} />
+          {(isEUH || isGrid) && (
+            <WeekPicker T={T} dk={dk} label="Resident" week={form.resident} list={resList}
+              color="#7B6BA8" onChange={v=>set("resident", v)} />
+          )}
         </Section>
 
         {isEUH && <>
