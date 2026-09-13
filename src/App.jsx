@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import EditMode from "./Edit";
 
 // ═══════════════════════════════════════════════════════════════
@@ -46,11 +46,25 @@ const checkDynamicMaint = (setDown) => {
     if (script.parentNode) script.parentNode.removeChild(script);
     const on = !!(d && d.ok && d.maintenance);
     try { localStorage.setItem(DYN_MAINT_KEY, JSON.stringify({on, ts: Date.now()})); } catch (e) {}
+    if (d && d.ok) setScriptVersion(Number(d.v) || 5);
     if (on) setDown(true);
   };
   script.onerror = () => { clearTimeout(timer); try { delete window[cb]; } catch (e) {} };
   script.src = `${SUGGESTION_ENDPOINT}?mode=get_maintenance&callback=${cb}&_=${Date.now()}`;
   document.body.appendChild(script);
+};
+
+// ── Which Apps Script is deployed ────────────────────────────────────────────
+// v5 (original) writes the physician/resident to the Friday row only, so the
+// app takes Friday as the whole week and reads day-specific changes from
+// hidden "#att:<Day>:<Name>" / "#res:<Day>:<Name>" rows in Other Numbers
+// (the one per-tab slot v5 can write). v6+ writes every day row itself.
+const SCRIPT_V_KEY = "iroc_script_v";
+const scriptVersionListeners = new Set();
+const getScriptVersion = () => { try { return Number(localStorage.getItem(SCRIPT_V_KEY)) || 5; } catch (e) { return 5; } };
+const setScriptVersion = (v) => {
+  try { localStorage.setItem(SCRIPT_V_KEY, String(v)); } catch (e) {}
+  scriptVersionListeners.forEach(fn => fn(v));
 };
 
 const BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSz1MLm6ZSF1hSKaxr6bdDrO98npeCxLhrkaxcdsKytZgAIPE80wCs1o0ot5ATTPcjTuf3wRfgs1VVM/pub";
@@ -411,6 +425,42 @@ const parseGMHTab = (text, data) => {
   });
 };
 
+// Day-specific attending/resident stored as hidden Other Numbers rows.
+const OVERRIDE_ROW = /^#(att|res):(Friday|Saturday|Sunday|Monday|Tuesday|Wednesday|Thursday):(.*)$/;
+
+// Pull override rows out of every hospital's Other Numbers, and on the v5
+// script make Friday's physician/resident cover the whole week (v5 never
+// writes the other rows, so whatever they hold is stale).
+const applyWeekRules = (raw, scriptV) => {
+  if (!raw) return raw;
+  const data = JSON.parse(JSON.stringify(raw));
+  Object.keys(data).forEach(id => {
+    const h = data[id]; if (!h) return;
+    const overrides = { IR: {}, Resident: {} };
+    if (h._extraNumbers) {
+      h._extraNumbers = h._extraNumbers.filter(n => {
+        const m = OVERRIDE_ROW.exec(n.label || ""); if (!m) return true;
+        overrides[m[1] === "att" ? "IR" : "Resident"][m[2]] = { name: m[3].trim(), phone: n.phone || "" };
+        return false;
+      });
+      if (!h._extraNumbers.length) delete h._extraNumbers;
+    }
+    if (scriptV >= 6) return;
+    ["IR", "Resident"].forEach(role => {
+      const week = h[role]; if (!week || !week.Friday || !week.Friday.name) return;
+      const base = week.Friday;
+      DAYS.forEach(day => {
+        if (day === "Friday" || !week[day]) return;
+        const o = overrides[role][day];
+        const nm = (o && o.name) ? o.name : base.name;
+        const ph = (o && o.name) ? o.phone : base.phone;
+        week[day] = { ...week[day], name: nm, phone: ph };
+      });
+    });
+  });
+  return data;
+};
+
 const initData = () => {
   const data = {};
   HOSPITALS.forEach(h => {
@@ -609,7 +659,10 @@ export default function App() {
 }
 
 function MainApp() {
-  const [schedule, setSchedule] = useState(null);
+  const [rawSchedule, setSchedule] = useState(null);
+  const [scriptV, setScriptV] = useState(getScriptVersion);
+  useEffect(() => { scriptVersionListeners.add(setScriptV); return () => scriptVersionListeners.delete(setScriptV); }, []);
+  const schedule = useMemo(() => applyWeekRules(rawSchedule, scriptV), [rawSchedule, scriptV]);
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedDay, setSelectedDay] = useState(getDayName());
@@ -911,7 +964,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.12.0
+              IROC v10.12.1
             </div>
 
             <div style={{ height:"30px" }} />
