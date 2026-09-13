@@ -819,24 +819,24 @@ function MainApp() {
             <>
               <div onClick={()=>setMenuOpen(false)}
                 style={{ position:"fixed", inset:0, zIndex:40 }} />
-              <div style={{ position:"absolute", top:"46px", right:0, zIndex:50, minWidth:"188px",
+              <div style={{ position:"absolute", top:"46px", right:0, zIndex:50, minWidth:"236px",
                 background:T.card, border:`1px solid ${T.cardBorder}`, borderRadius:"12px",
                 overflow:"hidden", boxShadow:"0 8px 24px rgba(0,0,0,0.18)" }}>
                 <div onClick={()=>{ setMenuOpen(false); setEditOpen(true); }}
                   style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
-                    color:T.text, fontWeight:700, fontSize:"13px", cursor:"pointer",
+                    color:T.text, fontWeight:700, fontSize:"13px", whiteSpace:"nowrap", cursor:"pointer",
                     borderBottom:`1px solid ${T.cardBorder}` }}>
                   🔒 Scheduler Login
                 </div>
                 <div onClick={()=>{ setMenuOpen(false); setSugOpen(true); }}
                   style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
-                    color:T.text, fontWeight:600, fontSize:"13px", cursor:"pointer",
+                    color:T.text, fontWeight:600, fontSize:"13px", whiteSpace:"nowrap", cursor:"pointer",
                     borderBottom:`1px solid ${T.cardBorder}` }}>
                   💡 Suggest an improvement
                 </div>
                 <div onClick={()=>{ const nt = dk ? "light" : "dark"; setTheme(nt); try { localStorage.setItem("iroc_theme", nt); } catch (e) {} setMenuOpen(false); }}
                   style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
-                    color:T.text, fontWeight:600, fontSize:"13px", cursor:"pointer" }}>
+                    color:T.text, fontWeight:600, fontSize:"13px", whiteSpace:"nowrap", cursor:"pointer" }}>
                   {dk ? "☀️ Light mode" : "🌙 Dark mode"}
                 </div>
               </div>
@@ -983,7 +983,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.12.2
+              IROC v10.12.3
             </div>
 
             <div style={{ height:"30px" }} />
