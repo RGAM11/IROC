@@ -73,11 +73,11 @@ const WEEKEND = ["Saturday","Sunday"];
 
 const HOSPS = [
   { k:"EUH",   label:"EUH — Emory University",   color:"#3D7A8F", tab:"EUH" },
-  { k:"MTWEM", label:"MT/WEM — Midtown",         color:"#4A7EA0", tab:"MTWEM" },
+  { k:"MTWEM", label:"MT/WEM — Midtown",         color:"#3D7A8F", tab:"MTWEM" },
   { k:"EHH",   label:"EHH — Hillandale",         color:"#4A8A75", tab:"EHH-EDH" },
-  { k:"EDH",   label:"EDH — Decatur",            color:"#7B6BA8", tab:"EHH-EDH" },
+  { k:"EDH",   label:"EDH — Decatur",            color:"#4A8A75", tab:"EHH-EDH" },
   { k:"ESJH",  label:"ESJH — Saint Joseph's",    color:"#B8892E", tab:"ESJH-EJCH" },
-  { k:"EJCH",  label:"EJCH — Johns Creek",       color:"#A8524A", tab:"ESJH-EJCH" },
+  { k:"EJCH",  label:"EJCH — Johns Creek",       color:"#B8892E", tab:"ESJH-EJCH" },
   { k:"GMH",   label:"GMH — Grady Memorial",     color:"#7A5A90", tab:"GMH" },
 ];
 const TABKEY = { "EUH":"EUH", "EHH-EDH":"EHHEDH", "MTWEM":"MTWEM", "ESJH-EJCH":"ESJHEJCH", "GMH":"GMH" };
