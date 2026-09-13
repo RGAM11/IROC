@@ -911,7 +911,7 @@ function MainApp() {
             </div>
 
             <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.11.3
+              IROC v10.11.4
             </div>
 
             <div style={{ height:"30px" }} />
