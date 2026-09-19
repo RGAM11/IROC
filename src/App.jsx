@@ -712,7 +712,7 @@ function MainApp() {
   // When a hospital is opened we push a history entry; the phone back button
   // fires popstate, which we intercept to return to the hospital list.
   useEffect(() => {
-    const onPop = () => { setSelectedHospital(null); };
+    const onPop = () => { setEditOpen(false); setSelectedHospital(null); };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
@@ -754,6 +754,18 @@ function MainApp() {
     dayBg: dk ? "#1A2332" : "#fff", dayBorder: dk ? "#2D3B4E" : "#E2E8F0",
     oncallBg: dk ? "#1A2332" : "#fff", weekBg: dk ? "#1A2332" : "#fff",
     quickLinkText: dk ? "#E2E8F0" : "#1E293B",
+  };
+
+  // The Scheduler is an overlay, so give it its own history entry: the phone's
+  // back button then closes it and lands on the home screen instead of leaving
+  // the app. Closing it with ✕ pops that entry so history doesn't pile up.
+  const openScheduler = () => {
+    try { window.history.pushState({ scheduler: true }, ""); } catch (e) {}
+    setEditOpen(true);
+  };
+  const closeScheduler = () => {
+    if (window.history.state && window.history.state.scheduler) window.history.back();
+    else setEditOpen(false);
   };
 
   const handleSelectHospital = (id) => {
@@ -836,7 +848,7 @@ function MainApp() {
 
         {editOpen && (
           <EditMode endpoint={SUGGESTION_ENDPOINT} T={T} dk={dk}
-            onClose={()=>setEditOpen(false)} />
+            onClose={closeScheduler} />
         )}
 
         {/* ── theme toggle — top-right corner, level with the IROC title ── */}
@@ -845,10 +857,10 @@ function MainApp() {
           WebkitTapHighlightColor:"transparent" }}>
           <div onClick={()=>{ const nt = dk ? "light" : "dark"; setTheme(nt); try { localStorage.setItem("iroc_theme", nt); } catch (e) {} }}
             title={dk ? "Switch to light mode" : "Switch to dark mode"}
-            style={{ width:"30px", height:"30px", borderRadius:"9px", display:"flex",
+            style={{ width:"26px", height:"26px", borderRadius:"8px", display:"flex",
               alignItems:"center", justifyContent:"center", cursor:"pointer",
               background:T.card, border:`1px solid ${T.cardBorder}`,
-              color:T.text, fontSize:"13px", lineHeight:1 }}>
+              color:T.text, fontSize:"11px", lineHeight:1 }}>
             {/* the icon shows the mode you would switch TO */}
             {dk ? "☀️" : "🌙"}
           </div>
@@ -870,7 +882,7 @@ function MainApp() {
             </div>
           </div>
 
-          <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto", width:"100%", boxSizing:"border-box", paddingBottom:"14px", flex:1, display:"flex", flexDirection:"column" }}>
+          <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto", width:"100%", boxSizing:"border-box", paddingBottom:"30px", flex:1, display:"flex", flexDirection:"column" }}>
             <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
               {pairRows.map((row, i) => (
                 <div key={i}>
@@ -975,9 +987,9 @@ function MainApp() {
                 foot of the screen when the page is shorter than the viewport ── */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
               marginTop:"auto", paddingTop:"18px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              <span>v10.14.3</span>
+              <span>v10.14.4</span>
               <span>·</span>
-              <span onClick={()=>setEditOpen(true)}
+              <span onClick={openScheduler}
                 style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
                 🔒 Scheduler
               </span>
