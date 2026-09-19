@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ── Request helper ──
 // IMPORTANT: we send the request WITHOUT Google cookies (credentials:"omit").
@@ -343,6 +343,26 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
     setBusy(false);
   };
 
+  // On-screen keypad: the code is digits only, so the phone keyboard never
+  // needs to open (and can't cover the screen).
+  const tapKey = (k) => {
+    setErr("");
+    if (k === "del") setCode(c => c.slice(0, -1));
+    else if (k === "go") login();
+    else setCode(c => (c.length >= 12 ? c : c + k));
+  };
+  // Physical keyboards still work, for anyone on a laptop.
+  useEffect(() => {
+    if (step !== "login") return;
+    const onKey = (e) => {
+      if (/^[0-9]$/.test(e.key)) { setErr(""); setCode(c => (c.length >= 12 ? c : c + e.key)); }
+      else if (e.key === "Backspace") setCode(c => c.slice(0, -1));
+      else if (e.key === "Enter") login();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [step, code]);
+
   const toggleMaint = async () => {
     setMaintBusy(true); setMaintErr("");
     const newVal = !maintOn;
@@ -459,34 +479,58 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
   };
 
   // ═══ LOGIN ═══
-  if (step === "login") return (
-    <div style={{...page, background:"#112240", display:"flex", flexDirection:"column",
-      alignItems:"center", justifyContent:"center", padding:"24px"}}>
-      <div style={{ fontSize:"40px", marginBottom:"12px" }}>🔒</div>
-      <div style={{ color:"#C8D8E8", fontWeight:800, fontSize:"20px" }}>Scheduler Access</div>
-      <div style={{ color:"#8FA8C4", fontSize:"12px", marginTop:"6px", marginBottom:"22px" }}>
-        Enter the scheduler code
+  if (step === "login") {
+    const keyBtn = { display:"flex", alignItems:"center", justifyContent:"center",
+      height:"56px", borderRadius:"12px", background:"#1D3557", border:"1px solid #33517D",
+      color:"#fff", fontSize:"22px", fontWeight:700, cursor:"pointer", userSelect:"none",
+      WebkitTapHighlightColor:"transparent" };
+    return (
+      <div style={{ ...page, background:"#112240", overflow:"hidden", display:"flex",
+        flexDirection:"column", alignItems:"center", justifyContent:"flex-start",
+        padding:"0 24px", paddingTop:"max(6vh, 28px)", boxSizing:"border-box" }}>
+        <div style={{ fontSize:"34px", marginBottom:"8px" }}>🔒</div>
+        <div style={{ color:"#C8D8E8", fontWeight:800, fontSize:"19px" }}>Scheduler Access</div>
+        <div style={{ color:"#8FA8C4", fontSize:"12px", marginTop:"5px" }}>
+          Enter the scheduler code
+        </div>
+
+        {/* what has been typed so far */}
+        <div style={{ width:"232px", height:"52px", marginTop:"16px", borderRadius:"10px",
+          border:"2px solid #3A5C86", background:"#1D3557", color:"#fff", fontWeight:700,
+          fontSize:"24px", letterSpacing:"10px", textIndent:"10px",
+          display:"flex", alignItems:"center", justifyContent:"center" }}>
+          {code
+            ? code
+            : <span style={{ color:"#61809F", fontSize:"13px", letterSpacing:"3px" }}>enter code</span>}
+        </div>
+
+        {err && <div style={{ color:"#F08A80", fontSize:"12px", marginTop:"10px",
+          textAlign:"center", maxWidth:"300px", lineHeight:1.5 }}>{err}</div>}
+
+        {/* keypad */}
+        <div style={{ width:"232px", marginTop:"14px", display:"grid",
+          gridTemplateColumns:"repeat(3, 1fr)", gap:"8px" }}>
+          {["1","2","3","4","5","6","7","8","9"].map(d => (
+            <div key={d} style={keyBtn} onClick={()=>tapKey(d)}>{d}</div>
+          ))}
+          {/* Unlock is the only submit, so the bottom row is just 0 and delete. */}
+          <div />
+          <div style={keyBtn} onClick={()=>tapKey("0")}>0</div>
+          <div style={{ ...keyBtn, background:"transparent", border:"1px solid #2A4468",
+            color:"#8FA8C4", fontSize:"18px" }} onClick={()=>tapKey("del")}>⌫</div>
+        </div>
+
+        <button onClick={login} disabled={busy}
+          style={{ marginTop:"14px", width:"232px", padding:"13px", borderRadius:"10px",
+            background:"#3D7A8F", color:"#fff", fontWeight:700, fontSize:"14px",
+            border:"none", opacity: busy?0.6:1, cursor:"pointer" }}>
+          {busy ? "Checking…" : "Unlock"}
+        </button>
+        <div onClick={onClose} style={{ marginTop:"14px", color:"#6B84A0",
+          fontSize:"12px", cursor:"pointer", padding:"6px 16px" }}>Cancel</div>
       </div>
-      <input type="text" inputMode="numeric" value={code}
-        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
-        name="iroc-code" placeholder="code"
-        onChange={e=>setCode(e.target.value.replace(/\s/g,""))}
-        onKeyDown={e=>{ if(e.key==="Enter") login(); }}
-        style={{ width:"210px", textAlign:"center", letterSpacing:"8px", fontSize:"22px",
-          padding:"12px", borderRadius:"10px", border:"2px solid #3A5C86",
-          background:"#1D3557", color:"#fff", fontWeight:700 }} />
-      {err && <div style={{ color:"#F08A80", fontSize:"12px", marginTop:"14px",
-        textAlign:"center", maxWidth:"300px", lineHeight:1.5 }}>{err}</div>}
-      <button onClick={login} disabled={busy}
-        style={{ marginTop:"18px", width:"210px", padding:"13px", borderRadius:"9px",
-          background:"#3D7A8F", color:"#fff", fontWeight:700, fontSize:"14px",
-          border:"none", opacity: busy?0.6:1 }}>
-        {busy ? "Checking…" : "Unlock"}
-      </button>
-      <div onClick={onClose} style={{ marginTop:"20px", color:"#6B84A0",
-        fontSize:"12px", cursor:"pointer" }}>Cancel</div>
-    </div>
-  );
+    );
+  }
 
   // ═══ SITE LIST ═══
   if (step === "list") return (
