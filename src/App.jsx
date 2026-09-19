@@ -702,7 +702,6 @@ function MainApp() {
     try { if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark"; } catch (e) {}
     return "light";
   });
-  const [menuOpen, setMenuOpen] = useState(false);
   const [sugOpen, setSugOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -789,6 +788,10 @@ function MainApp() {
     const gmh = HOSPITALS.find(h=>h.id===7);
     const onCallDay = getOnCallDayName();
     const previewName = (e) => (e && e.name && e.name !== "N/A" && e.name !== "Weekend Only") ? e.name : null;
+    const qTile = { display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-start",
+      gap:"4px", padding:"8px 2px", borderRadius:"10px", textDecoration:"none",
+      background:T.card, border:`1px solid ${T.cardBorder}`, cursor:"pointer" };
+    const qLabel = { fontSize:"8px", fontWeight:700, color:T.text, textAlign:"center", lineHeight:1.15 };
     const Card = ({h}) => {
       const att = previewName(schedule?.[h.id]?.IR?.[onCallDay]);
       const res = previewName(schedule?.[h.id]?.Resident?.[onCallDay]);
@@ -798,27 +801,30 @@ function MainApp() {
         padding:"8px 10px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
         transition:"all 0.15s", minWidth:0, overflow:"hidden", borderLeft:`4px solid ${h.color}`, position:"relative", zIndex:2,
       }}>
-        <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-          <div style={{ width:"34px", height:"34px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"8px":"11px" }}>{h.abbr}</span>
+        {/* The circle carries the hospital name, so the space beside it holds
+            who is on call instead of repeating the abbreviation. */}
+        <div style={{ display:"flex", alignItems:"center", gap:"9px" }}>
+          <div style={{ width:"38px", height:"38px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"8.5px":"12px" }}>{h.abbr}</span>
           </div>
           <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
-            <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
+            {att ? (
+              <>
+                <div style={{ fontSize:"11px", color:T.roleText, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                  <span style={{ fontWeight:700, color:T.text }}>Attending</span> · {att}
+                </div>
+                {res && (
+                  <div style={{ fontSize:"11px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                    <span style={{ fontWeight:700, color:T.text }}>Resident</span> · {res}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
+            )}
           </div>
           <div style={{ color:T.textMuted, fontSize:"18px", flexShrink:0 }}>›</div>
         </div>
-        {att && (
-          <div style={{ marginTop:"5px", paddingTop:"5px", borderTop:`1px dashed ${T.cardBorder}` }}>
-            <div style={{ fontSize:"11px", color:T.roleText, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-              <span style={{ fontWeight:700, color:T.text }}>Attending</span> · {att}
-            </div>
-            {res && (
-              <div style={{ fontSize:"11px", color:T.roleText, marginTop:"1px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-                <span style={{ fontWeight:700, color:T.text }}>Resident</span> · {res}
-              </div>
-            )}
-          </div>
-        )}
       </div>
       );
     };
@@ -828,105 +834,23 @@ function MainApp() {
 
         {editOpen && (
           <EditMode endpoint={SUGGESTION_ENDPOINT} T={T} dk={dk}
-            onClose={()=>{ setEditOpen(false); setMenuOpen(false); }} />
+            onClose={()=>setEditOpen(false)} />
         )}
 
-        {/* ── top-right menu — level with the IROC title, not selectable ── */}
+        {/* ── theme toggle — top-right corner, level with the IROC title ── */}
         <div style={{ position:"absolute", top:"14px", right:"14px", zIndex:50,
           userSelect:"none", WebkitUserSelect:"none", WebkitTouchCallout:"none",
           WebkitTapHighlightColor:"transparent" }}>
-          <div onClick={()=>setMenuOpen(o=>!o)}
+          <div onClick={()=>{ const nt = dk ? "light" : "dark"; setTheme(nt); try { localStorage.setItem("iroc_theme", nt); } catch (e) {} }}
+            title={dk ? "Switch to light mode" : "Switch to dark mode"}
             style={{ width:"40px", height:"40px", borderRadius:"10px", display:"flex",
               alignItems:"center", justifyContent:"center", cursor:"pointer",
               background:T.card, border:`1px solid ${T.cardBorder}`,
-              color:T.text, fontSize:"18px", fontWeight:700, lineHeight:1 }}>
-            ⋮
+              color:T.text, fontSize:"17px", lineHeight:1 }}>
+            {/* the icon shows the mode you would switch TO */}
+            {dk ? "☀️" : "🌙"}
           </div>
-          {menuOpen && (
-            <>
-              <div onClick={()=>setMenuOpen(false)}
-                style={{ position:"fixed", inset:0, zIndex:40 }} />
-              <div style={{ position:"absolute", top:"46px", right:0, zIndex:50, minWidth:"236px",
-                background:T.card, border:`1px solid ${T.cardBorder}`, borderRadius:"12px",
-                overflow:"hidden", boxShadow:"0 8px 24px rgba(0,0,0,0.18)" }}>
-                <div onClick={()=>{ setMenuOpen(false); setEditOpen(true); }}
-                  style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
-                    color:T.text, fontWeight:700, fontSize:"13px", whiteSpace:"nowrap", cursor:"pointer",
-                    borderBottom:`1px solid ${T.cardBorder}` }}>
-                  🔒 Scheduler Login
-                </div>
-                <div onClick={()=>{ setMenuOpen(false); setSugOpen(true); }}
-                  style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
-                    color:T.text, fontWeight:600, fontSize:"13px", whiteSpace:"nowrap", cursor:"pointer",
-                    borderBottom:`1px solid ${T.cardBorder}` }}>
-                  💡 Suggest an improvement
-                </div>
-                <div onClick={()=>{ const nt = dk ? "light" : "dark"; setTheme(nt); try { localStorage.setItem("iroc_theme", nt); } catch (e) {} setMenuOpen(false); }}
-                  style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:"9px",
-                    color:T.text, fontWeight:600, fontSize:"13px", whiteSpace:"nowrap", cursor:"pointer" }}>
-                  {dk ? "☀️ Light mode" : "🌙 Dark mode"}
-                </div>
-              </div>
-            </>
-          )}
         </div>
-
-        {/* ── Suggestion sheet (opened from the ⋮ menu) ── */}
-        {sugOpen && (
-          <div onClick={()=>setSugOpen(false)}
-            style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(0,0,0,0.45)",
-              display:"flex", alignItems:"flex-end", justifyContent:"center" }}>
-            <div onClick={e=>e.stopPropagation()}
-              style={{ width:"100%", maxWidth:"520px", background: dk ? "#132033" : "#FFFFFF",
-                borderRadius:"16px 16px 0 0", padding:"14px 14px 26px", boxSizing:"border-box",
-                boxShadow:"0 -8px 24px rgba(0,0,0,0.25)" }}>
-              <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:"2px" }}>
-                <div onClick={()=>setSugOpen(false)}
-                  style={{ padding:"4px 10px", color:T.textMuted, fontWeight:700, fontSize:"16px", cursor:"pointer" }}>✕</div>
-              </div>
-            <div>
-              <div style={{ fontSize:"10px", letterSpacing:"1.5px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"6px" }}>
-                💡 Suggest an Improvement
-              </div>
-              <textarea
-                value={suggestion}
-                onChange={(e)=>{ setSuggestion(e.target.value); if (sugStatus==="sent"||sugStatus==="error") setSugStatus("idle"); }}
-                placeholder="Idea, issue, or feature request…"
-                rows={4}
-                style={{ width:"100%", boxSizing:"border-box", padding:"8px", borderRadius:"9px", resize:"vertical",
-                  border:`1px solid ${T.cardBorder}`, background: dk ? "#0F1D30" : "#F7FAFC",
-                  color: dk ? "#E2E8F0" : "#1E293B", fontSize:"13px", fontFamily:"inherit" }}
-              />
-              <div
-                onClick={async ()=>{
-                  if (!suggestion.trim() || sugStatus==="sending") return;
-                  const text = suggestion.trim();
-                  setSugStatus("sending");
-                  const url = `${SUGGESTION_ENDPOINT}?s=${encodeURIComponent(text)}&t=${Date.now()}`;
-                  try {
-                    await fetch(url, { method:"GET", mode:"no-cors", cache:"no-store", redirect:"follow" });
-                    setSugStatus("sent"); setSuggestion(""); logEvent("suggest");
-                  } catch(e) {
-                    // Fallback: image beacon — can't be blocked by CORS
-                    try {
-                      const img = new Image();
-                      img.src = url;
-                      setSugStatus("sent"); setSuggestion(""); logEvent("suggest");
-                    } catch(e2) { setSugStatus("error"); }
-                  }
-                }}
-                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", marginTop:"6px",
-                  padding:"10px", borderRadius:"9px", fontWeight:700, fontSize:"13px",
-                  background: sugStatus==="sent" ? "#2A9D5A" : (suggestion.trim() ? "linear-gradient(135deg, #3D7A8F 0%, #2B5A6C 100%)" : (dk ? "#1A2A3F" : "#E2E8F0")),
-                  color: (suggestion.trim()||sugStatus==="sent") ? "#fff" : T.textMuted,
-                  cursor: suggestion.trim() ? "pointer" : "default" }}
-              >
-                {sugStatus==="sending" ? "Sending…" : sugStatus==="sent" ? "✓ Sent — thank you!" : sugStatus==="error" ? "Couldn't send — tap to retry" : "📨 Send Suggestion"}
-              </div>
-            </div>
-            </div>
-          </div>
-        )}
 
         <div style={{ position:"relative", zIndex:1 }}>
           <div style={{ paddingTop:"22px", textAlign:"center", position:"relative", zIndex:1 }}>
@@ -957,30 +881,14 @@ function MainApp() {
             </div>
             <div style={{ marginTop:"10px" }}><Card h={gmh}/></div>
 
-            <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}`, display:"flex", flexDirection:"column" }}>
+            {/* ── Quick links — all five on one row ── */}
+            <div style={{ marginTop:"24px", paddingTop:"20px", borderTop:`1px solid ${T.cardBorder}` }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginTop:"8px", order:2 }}>
-                <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "EHConnect")} style={{
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
-                  padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #6EA3C8 0%, #4A7EA0 100%)", color:"#fff", fontWeight:700, fontSize:"13px",
-                }}><span>🔗</span> EHConnect</a>
-                <a href="https://www.emoryhealthcare.org/-/media/Project/EH/Emory/ui/pdfs/ejch-physician-forms/2018-Consent-to-Medical-or-Surgical-Treatment.pdf" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "Blank Consent")} style={{
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
-                  padding:"14px 12px", borderRadius:"12px", textDecoration:"none",
-                  background:"linear-gradient(135deg, #C5DDE9 0%, #9CC5E0 100%)", color:"#2A4A5F", fontWeight:700, fontSize:"13px",
-                }}><span>📄</span> Blank Consent</a>
-              </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px", order:1 }}>
-              <a href="https://login.microsoftonline.com/e004fb9c-b0a4-424f-bcd0-322606d5df38/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&ear%5Fjwe%5Fcrypto=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImFwdiI6IkFBQUFDVVZoY2tOc2FXVnVkR2dBQUFCRlEwc3pNQUFBQUpJR1lzbStJSjVEMU5TbU5HL3RwYWh5bTZqVXlWNVpFZmozR3RXK0FrMStRditkTGlGdzNKc25TcEhHZk9WTXVLeEJsTFNqUExhd1lIQTI5ayt0QndOYmE1dmlLM2ozTnpxR0JubUViMXNXcEttTTlXa2J4ZjAzTlNEaHFDZUdjZ0FBQUJoeU9wMy8zSEdkbVRDcVV2eGRsR1VWcUFOQythN0VmUFk9In0%3D&ear%5Fjwk=eyJhbGciOiJFQ0RILUVTIiwiY3J2IjoiUC0zODQiLCJ4IjoiQUFBQU1KSUdZc20rSUo1RDFOU21ORy90cGFoeW02alV5VjVaRWZqM0d0VytBazErUXYrZExpRnczSnNuU3BIR2ZPVk11QT09IiwieSI6IkFBQUFNS3hCbExTalBMYXdZSEEyOWsrdEJ3TmJhNXZpSzNqM056cUdCbm1FYjFzV3BLbU05V2tieGYwM05TRGhxQ2VHY2c9PSIsImt0eSI6IkVDIn0%3D&spa%5Fclient%5Fid=08e18876%2D6177%2D487e%2Db8b5%2Dcf950c1e598c&client%5Finfo=1&response%5Ftype=code%20id%5Ftoken%20spa%5Frt&resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&scope=openid&nonce=4AE8661AA7463540F6A9B6325A39CFF8901F255A95BC6DE7%2D9494BA717D411087C1C45D5C24BCF455BDD924B4D04EE6C063C575BBF63EB244&redirect%5Furi=https%3A%2F%2Femory%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&state=OD0wJjMyPUFBTDRuQUFBQUJRNzI4MlFkU1lLamZBU0pYSiUyRmI4aVo4VzV2aGhhJTJGRzE2R2NvVkh1YU84c05pZlRrYmtid1Qza2hibkNHSCUyQnlGUDc4WkNLaDZtMVpLaVlCVkpaNCUyRnhOZ3lJMTF5RUIyRTJDM1hrS25lOTdNbXFiU1ZKSVFTVXlEaFBiaThiWnNlVEE4YXd4OTB4YXdwYVBlNyUyQk1FWXVseVlDN3hBY3dYQjVCZ2x2N1UwV3dJVyUyQkJRWkRhY0tCam5jZDR1RkolMkZWazhUSlJVOUN6Q0NOUndKbDBMbUJINGwyUCUyQnJJeGNTbmxNOFhHaVlDNEprJTJGbUg5R2NOUXFWZlFqcXBKOUlwYnFYT3FhalZrcE05WXJwUnhpT1dwQVBzTXNzYU4yOFJKJTJGd3l5UVA4N3cyVVB2WWk3Q3JPczJSTDlObTV0JTJGNHNnUWw4czBpbXBRSzE0Z1JzMzJsMFNEOURqNGlMYjlNdCUyRk9tNzFCamh4RDNCMlExdDE4bU1yMW4wTkNJayUzRA&claims=%7B%22id%5Ftoken%22%3A%7B%22xms%5Fcc%22%3A%7B%22values%22%3A%5B%22CP1%22%5D%7D%7D%7D&wsucxt=1&cobrandid=11bd8083%2D87e0%2D41b5%2Dbb78%2D0bc43c8a8e8a&client%2Drequest%2Did=57b818a2%2Db001%2D8000%2D10c8%2Da79f04538046&sso_reload=true" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "OneDrive")} style={{
-                display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"6px",
-                padding:"10px 4px", borderRadius:"12px", textDecoration:"none",
-                background:T.card, border:`1px solid ${T.cardBorder}`,
-              }}>
-                <span style={{ fontSize:"26px", lineHeight:1 }}>☁️</span>
-                <span style={{ fontSize:"10px", fontWeight:700, color:T.text, textAlign:"center", lineHeight:1.2 }}>OneDrive</span>
-              </a>
-
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"5px" }}>
+                <a href="https://login.microsoftonline.com/e004fb9c-b0a4-424f-bcd0-322606d5df38/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&ear%5Fjwe%5Fcrypto=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImFwdiI6IkFBQUFDVVZoY2tOc2FXVnVkR2dBQUFCRlEwc3pNQUFBQUpJR1lzbStJSjVEMU5TbU5HL3RwYWh5bTZqVXlWNVpFZmozR3RXK0FrMStRditkTGlGdzNKc25TcEhHZk9WTXVLeEJsTFNqUExhd1lIQTI5ayt0QndOYmE1dmlLM2ozTnpxR0JubUViMXNXcEttTTlXa2J4ZjAzTlNEaHFDZUdjZ0FBQUJoeU9wMy8zSEdkbVRDcVV2eGRsR1VWcUFOQythN0VmUFk9In0%3D&ear%5Fjwk=eyJhbGciOiJFQ0RILUVTIiwiY3J2IjoiUC0zODQiLCJ4IjoiQUFBQU1KSUdZc20rSUo1RDFOU21ORy90cGFoeW02alV5VjVaRWZqM0d0VytBazErUXYrZExpRnczSnNuU3BIR2ZPVk11QT09IiwieSI6IkFBQUFNS3hCbExTalBMYXdZSEEyOWsrdEJ3TmJhNXZpSzNqM056cUdCbm1FYjFzV3BLbU05V2tieGYwM05TRGhxQ2VHY2c9PSIsImt0eSI6IkVDIn0%3D&spa%5Fclient%5Fid=08e18876%2D6177%2D487e%2Db8b5%2Dcf950c1e598c&client%5Finfo=1&response%5Ftype=code%20id%5Ftoken%20spa%5Frt&resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&scope=openid&nonce=4AE8661AA7463540F6A9B6325A39CFF8901F255A95BC6DE7%2D9494BA717D411087C1C45D5C24BCF455BDD924B4D04EE6C063C575BBF63EB244&redirect%5Furi=https%3A%2F%2Femory%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&state=OD0wJjMyPUFBTDRuQUFBQUJRNzI4MlFkU1lLamZBU0pYSiUyRmI4aVo4VzV2aGhhJTJGRzE2R2NvVkh1YU84c05pZlRrYmtid1Qza2hibkNHSCUyQnlGUDc4WkNLaDZtMVpLaVlCVkpaNCUyRnhOZ3lJMTF5RUIyRTJDM1hrS25lOTdNbXFiU1ZKSVFTVXlEaFBiaThiWnNlVEE4YXd4OTB4YXdwYVBlNyUyQk1FWXVseVlDN3hBY3dYQjVCZ2x2N1UwV3dJVyUyQkJRWkRhY0tCam5jZDR1RkolMkZWazhUSlJVOUN6Q0NOUndKbDBMbUJINGwyUCUyQnJJeGNTbmxNOFhHaVlDNEprJTJGbUg5R2NOUXFWZlFqcXBKOUlwYnFYT3FhalZrcE05WXJwUnhpT1dwQVBzTXNzYU4yOFJKJTJGd3l5UVA4N3cyVVB2WWk3Q3JPczJSTDlObTV0JTJGNHNnUWw4czBpbXBRSzE0Z1JzMzJsMFNEOURqNGlMYjlNdCUyRk9tNzFCamh4RDNCMlExdDE4bU1yMW4wTkNJayUzRA&claims=%7B%22id%5Ftoken%22%3A%7B%22xms%5Fcc%22%3A%7B%22values%22%3A%5B%22CP1%22%5D%7D%7D%7D&wsucxt=1&cobrandid=11bd8083%2D87e0%2D41b5%2Dbb78%2D0bc43c8a8e8a&client%2Drequest%2Did=57b818a2%2Db001%2D8000%2D10c8%2Da79f04538046&sso_reload=true" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "OneDrive")} style={qTile}>
+                  <span style={{ fontSize:"22px", lineHeight:1 }}>☁️</span>
+                  <span style={qLabel}>OneDrive</span>
+                </a>
                 <div onClick={()=>{
                   logEvent("link", "", "SIR Guidelines");
                   const ua = navigator.userAgent || "";
@@ -991,27 +899,85 @@ function MainApp() {
                   } else {
                     window.open("https://www.sirweb.org/practice-resources/clinical-practice/guidelines-and-statements/", "_blank");
                   }
-                }} style={{
-                  display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"6px",
-                  padding:"10px 4px", borderRadius:"12px", cursor:"pointer",
-                  background:T.card, border:`1px solid ${T.cardBorder}`,
-                }}>
-                  <img src="/sir-icon.png" alt="" style={{ width:"30px", height:"30px" }} />
-                  <span style={{ fontSize:"10px", fontWeight:700, color:T.text, textAlign:"center", lineHeight:1.2 }}>SIR Guidelines</span>
+                }} style={qTile}>
+                  <img src="/sir-icon.png" alt="" style={{ width:"22px", height:"22px" }} />
+                  <span style={qLabel}>SIR</span>
                 </div>
-                <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "OpenEvidence")} style={{
-                  display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"6px",
-                  padding:"10px 4px", borderRadius:"12px", textDecoration:"none",
-                  background:T.card, border:`1px solid ${T.cardBorder}`,
-                }}>
-                  <img src="/oe-icon.png" alt="" style={{ width:"30px", height:"30px" }} />
-                  <span style={{ fontSize:"10px", fontWeight:700, color:T.text, textAlign:"center", lineHeight:1.2 }}>OpenEvidence</span>
+                <a href="https://www.openevidence.com/" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "OpenEvidence")} style={qTile}>
+                  <img src="/oe-icon.png" alt="" style={{ width:"22px", height:"22px" }} />
+                  <span style={qLabel}>Open Evidence</span>
+                </a>
+                <a href="https://ehconnect.eushc.org/" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "EHConnect")} style={qTile}>
+                  <span style={{ fontSize:"22px", lineHeight:1 }}>🔗</span>
+                  <span style={qLabel}>EH Connect</span>
+                </a>
+                <a href="https://www.emoryhealthcare.org/-/media/Project/EH/Emory/ui/pdfs/ejch-physician-forms/2018-Consent-to-Medical-or-Surgical-Treatment.pdf" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "Blank Consent")} style={qTile}>
+                  <span style={{ fontSize:"22px", lineHeight:1 }}>📄</span>
+                  <span style={qLabel}>Blank Consent</span>
                 </a>
               </div>
             </div>
 
-            <div style={{ textAlign:"center", marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              IROC v10.13.0
+            {/* ── Suggestion box — expands in place under the quick links ── */}
+            <div style={{ marginTop:"14px", background:T.card, border:`1px solid ${T.cardBorder}`,
+              borderRadius:"12px", overflow:"hidden" }}>
+              <div onClick={()=>setSugOpen(o=>!o)}
+                style={{ display:"flex", alignItems:"center", gap:"8px", padding:"12px 14px",
+                  cursor:"pointer", color:T.text, fontWeight:700, fontSize:"13px" }}>
+                <span>💡</span>
+                <span style={{ flex:1 }}>Suggest an improvement</span>
+                <span style={{ color:T.textMuted, fontSize:"11px" }}>{sugOpen ? "▲" : "▼"}</span>
+              </div>
+              {sugOpen && (
+                <div style={{ padding:"0 14px 14px" }}>
+                  <textarea
+                    value={suggestion}
+                    onChange={(e)=>{ setSuggestion(e.target.value); if (sugStatus==="sent"||sugStatus==="error") setSugStatus("idle"); }}
+                    placeholder="Idea, issue, or feature request…"
+                    rows={4}
+                    style={{ width:"100%", boxSizing:"border-box", padding:"8px", borderRadius:"9px", resize:"vertical",
+                      border:`1px solid ${T.cardBorder}`, background: dk ? "#0F1D30" : "#F7FAFC",
+                      color: dk ? "#E2E8F0" : "#1E293B", fontSize:"13px", fontFamily:"inherit" }}
+                  />
+                  <div
+                    onClick={async ()=>{
+                      if (!suggestion.trim() || sugStatus==="sending") return;
+                      const text = suggestion.trim();
+                      setSugStatus("sending");
+                      const url = `${SUGGESTION_ENDPOINT}?s=${encodeURIComponent(text)}&t=${Date.now()}`;
+                      try {
+                        await fetch(url, { method:"GET", mode:"no-cors", cache:"no-store", redirect:"follow" });
+                        setSugStatus("sent"); setSuggestion(""); logEvent("suggest");
+                      } catch(e) {
+                        // Fallback: image beacon — can't be blocked by CORS
+                        try {
+                          const img = new Image();
+                          img.src = url;
+                          setSugStatus("sent"); setSuggestion(""); logEvent("suggest");
+                        } catch(e2) { setSugStatus("error"); }
+                      }
+                    }}
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"6px", marginTop:"6px",
+                      padding:"10px", borderRadius:"9px", fontWeight:700, fontSize:"13px",
+                      background: sugStatus==="sent" ? "#2A9D5A" : (suggestion.trim() ? "linear-gradient(135deg, #3D7A8F 0%, #2B5A6C 100%)" : (dk ? "#1A2A3F" : "#E2E8F0")),
+                      color: (suggestion.trim()||sugStatus==="sent") ? "#fff" : T.textMuted,
+                      cursor: suggestion.trim() ? "pointer" : "default" }}
+                  >
+                    {sugStatus==="sending" ? "Sending…" : sugStatus==="sent" ? "✓ Sent — thank you!" : sugStatus==="error" ? "Couldn't send — tap to retry" : "📨 Send Suggestion"}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ── Version + scheduler login, last line on the page ── */}
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
+              marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
+              <span>v10.14.0</span>
+              <span>·</span>
+              <span onClick={()=>setEditOpen(true)}
+                style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
+                🔒 Scheduler
+              </span>
             </div>
 
             <div style={{ height:"30px" }} />
