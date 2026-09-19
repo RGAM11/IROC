@@ -809,13 +809,15 @@ function MainApp() {
           </div>
           <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
             {att ? (
+              /* No role labels — the attending reads first and heavier, the
+                 resident second and lighter, which carries the same order. */
               <>
-                <div style={{ fontSize:"11px", color:T.roleText, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-                  <span style={{ fontWeight:700, color:T.text }}>Attending</span> · {att}
+                <div style={{ fontSize:"12px", fontWeight:600, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                  {att}
                 </div>
                 {res && (
-                  <div style={{ fontSize:"11px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-                    <span style={{ fontWeight:700, color:T.text }}>Resident</span> · {res}
+                  <div style={{ fontSize:"10.5px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                    {res}
                   </div>
                 )}
               </>
@@ -830,7 +832,7 @@ function MainApp() {
     };
 
     return (
-      <div style={{ minHeight:"100vh", background:T.homeBg, backgroundAttachment:"fixed", fontFamily:font, position:"relative", width:"100%", maxWidth:"100vw", overflowX:"hidden" }}>
+      <div style={{ minHeight:"100vh", background:T.homeBg, backgroundAttachment:"fixed", fontFamily:font, position:"relative", width:"100%", maxWidth:"100vw", overflowX:"hidden", display:"flex", flexDirection:"column" }}>
 
         {editOpen && (
           <EditMode endpoint={SUGGESTION_ENDPOINT} T={T} dk={dk}
@@ -843,17 +845,17 @@ function MainApp() {
           WebkitTapHighlightColor:"transparent" }}>
           <div onClick={()=>{ const nt = dk ? "light" : "dark"; setTheme(nt); try { localStorage.setItem("iroc_theme", nt); } catch (e) {} }}
             title={dk ? "Switch to light mode" : "Switch to dark mode"}
-            style={{ width:"40px", height:"40px", borderRadius:"10px", display:"flex",
+            style={{ width:"30px", height:"30px", borderRadius:"9px", display:"flex",
               alignItems:"center", justifyContent:"center", cursor:"pointer",
               background:T.card, border:`1px solid ${T.cardBorder}`,
-              color:T.text, fontSize:"17px", lineHeight:1 }}>
+              color:T.text, fontSize:"13px", lineHeight:1 }}>
             {/* the icon shows the mode you would switch TO */}
             {dk ? "☀️" : "🌙"}
           </div>
         </div>
 
-        <div style={{ position:"relative", zIndex:1 }}>
-          <div style={{ paddingTop:"22px", textAlign:"center", position:"relative", zIndex:1 }}>
+        <div style={{ position:"relative", zIndex:1, flex:1, display:"flex", flexDirection:"column" }}>
+          <div style={{ paddingTop:"22px", textAlign:"center", position:"relative", zIndex:1, flex:1, display:"flex", flexDirection:"column" }}>
             <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
@@ -969,10 +971,11 @@ function MainApp() {
               )}
             </div>
 
-            {/* ── Version + scheduler login, last line on the page ── */}
+            {/* ── Version + scheduler login — marginTop:auto drops this to the
+                foot of the screen when the page is shorter than the viewport ── */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
-              marginTop:"14px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              <span>v10.14.0</span>
+              marginTop:"auto", paddingTop:"18px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
+              <span>v10.14.1</span>
               <span>·</span>
               <span onClick={()=>setEditOpen(true)}
                 style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
@@ -980,7 +983,7 @@ function MainApp() {
               </span>
             </div>
 
-            <div style={{ height:"30px" }} />
+            <div style={{ height:"14px" }} />
           </div>
         </div>
       </div>
