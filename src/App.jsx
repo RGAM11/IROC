@@ -798,25 +798,25 @@ function MainApp() {
       return (
       <div onClick={()=>handleSelectHospital(h.id)} style={{
         background:T.card, borderRadius:"12px",
-        padding:"8px 10px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
+        padding:"12px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
         transition:"all 0.15s", minWidth:0, overflow:"hidden", borderLeft:`4px solid ${h.color}`, position:"relative", zIndex:2,
       }}>
         {/* The circle carries the hospital name, so the space beside it holds
             who is on call instead of repeating the abbreviation. */}
         <div style={{ display:"flex", alignItems:"center", gap:"9px" }}>
-          <div style={{ width:"38px", height:"38px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"8.5px":"12px" }}>{h.abbr}</span>
+          <div style={{ width:"44px", height:"44px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"9.5px":"13.5px" }}>{h.abbr}</span>
           </div>
           <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
             {att ? (
               /* No role labels — the attending reads first and heavier, the
                  resident second and lighter, which carries the same order. */
               <>
-                <div style={{ fontSize:"12px", fontWeight:600, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                <div style={{ fontSize:"13.5px", fontWeight:600, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                   {att}
                 </div>
                 {res && (
-                  <div style={{ fontSize:"10.5px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                  <div style={{ fontSize:"11.5px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                     {res}
                   </div>
                 )}
@@ -870,19 +870,21 @@ function MainApp() {
             </div>
           </div>
 
-          <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto", width:"100%", boxSizing:"border-box", paddingBottom:"14px", flex:1, display:"flex", flexDirection:"column", justifyContent:"space-between", gap:"10px" }}>
-            {pairRows.map((row, i) => (
-              <div key={i}>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
-                  {row.map(h => <Card key={h.id} h={h}/>)}
+          <div style={{ marginTop:"28px", paddingLeft:"16px", paddingRight:"16px", maxWidth:"500px", marginLeft:"auto", marginRight:"auto", width:"100%", boxSizing:"border-box", paddingBottom:"14px", flex:1, display:"flex", flexDirection:"column" }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+              {pairRows.map((row, i) => (
+                <div key={i}>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
+                    {row.map(h => <Card key={h.id} h={h}/>)}
+                  </div>
+                  <div style={{ height:"1px", background:T.cardBorder, margin:"8px 28px 0" }} />
                 </div>
-                <div style={{ height:"1px", background:T.cardBorder, margin:"10px 28px 0" }} />
-              </div>
-            ))}
-            <Card h={gmh}/>
+              ))}
+              <Card h={gmh}/>
+            </div>
 
             {/* ── Quick links — all five on one row ── */}
-            <div style={{ paddingTop:"16px", borderTop:`1px solid ${T.cardBorder}` }}>
+            <div style={{ marginTop:"18px", paddingTop:"16px", borderTop:`1px solid ${T.cardBorder}` }}>
               <div style={{ fontSize:"10px", letterSpacing:"2px", color:T.quickLinkText, fontWeight:700, textTransform:"uppercase", textAlign:"center", marginBottom:"8px" }}>Quick Links</div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"5px" }}>
                 <a href="https://login.microsoftonline.com/e004fb9c-b0a4-424f-bcd0-322606d5df38/oauth2/authorize?client%5Fid=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&response%5Fmode=form%5Fpost&ear%5Fjwe%5Fcrypto=eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImFwdiI6IkFBQUFDVVZoY2tOc2FXVnVkR2dBQUFCRlEwc3pNQUFBQUpJR1lzbStJSjVEMU5TbU5HL3RwYWh5bTZqVXlWNVpFZmozR3RXK0FrMStRditkTGlGdzNKc25TcEhHZk9WTXVLeEJsTFNqUExhd1lIQTI5ayt0QndOYmE1dmlLM2ozTnpxR0JubUViMXNXcEttTTlXa2J4ZjAzTlNEaHFDZUdjZ0FBQUJoeU9wMy8zSEdkbVRDcVV2eGRsR1VWcUFOQythN0VmUFk9In0%3D&ear%5Fjwk=eyJhbGciOiJFQ0RILUVTIiwiY3J2IjoiUC0zODQiLCJ4IjoiQUFBQU1KSUdZc20rSUo1RDFOU21ORy90cGFoeW02alV5VjVaRWZqM0d0VytBazErUXYrZExpRnczSnNuU3BIR2ZPVk11QT09IiwieSI6IkFBQUFNS3hCbExTalBMYXdZSEEyOWsrdEJ3TmJhNXZpSzNqM056cUdCbm1FYjFzV3BLbU05V2tieGYwM05TRGhxQ2VHY2c9PSIsImt0eSI6IkVDIn0%3D&spa%5Fclient%5Fid=08e18876%2D6177%2D487e%2Db8b5%2Dcf950c1e598c&client%5Finfo=1&response%5Ftype=code%20id%5Ftoken%20spa%5Frt&resource=00000003%2D0000%2D0ff1%2Dce00%2D000000000000&scope=openid&nonce=4AE8661AA7463540F6A9B6325A39CFF8901F255A95BC6DE7%2D9494BA717D411087C1C45D5C24BCF455BDD924B4D04EE6C063C575BBF63EB244&redirect%5Furi=https%3A%2F%2Femory%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&state=OD0wJjMyPUFBTDRuQUFBQUJRNzI4MlFkU1lLamZBU0pYSiUyRmI4aVo4VzV2aGhhJTJGRzE2R2NvVkh1YU84c05pZlRrYmtid1Qza2hibkNHSCUyQnlGUDc4WkNLaDZtMVpLaVlCVkpaNCUyRnhOZ3lJMTF5RUIyRTJDM1hrS25lOTdNbXFiU1ZKSVFTVXlEaFBiaThiWnNlVEE4YXd4OTB4YXdwYVBlNyUyQk1FWXVseVlDN3hBY3dYQjVCZ2x2N1UwV3dJVyUyQkJRWkRhY0tCam5jZDR1RkolMkZWazhUSlJVOUN6Q0NOUndKbDBMbUJINGwyUCUyQnJJeGNTbmxNOFhHaVlDNEprJTJGbUg5R2NOUXFWZlFqcXBKOUlwYnFYT3FhalZrcE05WXJwUnhpT1dwQVBzTXNzYU4yOFJKJTJGd3l5UVA4N3cyVVB2WWk3Q3JPczJSTDlObTV0JTJGNHNnUWw4czBpbXBRSzE0Z1JzMzJsMFNEOURqNGlMYjlNdCUyRk9tNzFCamh4RDNCMlExdDE4bU1yMW4wTkNJayUzRA&claims=%7B%22id%5Ftoken%22%3A%7B%22xms%5Fcc%22%3A%7B%22values%22%3A%5B%22CP1%22%5D%7D%7D%7D&wsucxt=1&cobrandid=11bd8083%2D87e0%2D41b5%2Dbb78%2D0bc43c8a8e8a&client%2Drequest%2Did=57b818a2%2Db001%2D8000%2D10c8%2Da79f04538046&sso_reload=true" target="_blank" rel="noopener noreferrer" onClick={()=>logEvent("link", "", "OneDrive")} style={qTile}>
@@ -919,7 +921,7 @@ function MainApp() {
             </div>
 
             {/* ── Suggestion box — expands in place under the quick links ── */}
-            <div style={{ background:T.card, border:`1px solid ${T.cardBorder}`,
+            <div style={{ marginTop:"12px", background:T.card, border:`1px solid ${T.cardBorder}`,
               borderRadius:"12px", overflow:"hidden" }}>
               <div onClick={()=>setSugOpen(o=>!o)}
                 style={{ display:"flex", alignItems:"center", gap:"8px", padding:"12px 14px",
@@ -972,8 +974,8 @@ function MainApp() {
             {/* ── Version + scheduler login — marginTop:auto drops this to the
                 foot of the screen when the page is shorter than the viewport ── */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
-              fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              <span>v10.14.2</span>
+              marginTop:"auto", paddingTop:"18px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
+              <span>v10.14.3</span>
               <span>·</span>
               <span onClick={()=>setEditOpen(true)}
                 style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
