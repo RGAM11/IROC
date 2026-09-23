@@ -167,7 +167,6 @@ const HOSPITAL_ROLES = {
   2: [
     { key:"IR",               label:"IR",                  icon:"🩺", row:0, hideWeek:true },
     { key:"NursingSupervisor",label:"Nursing Supervisor",  icon:"👩‍⚕️", row:1, static:true, phone:"470-382-0191", dynamicPhone:"_nursingSup", note:"Call this number to have the RN and techs called in. They will also provide the on-call anesthesiologist's number." },
-    { key:"Anesthesia",       label:"Anesthesia",          icon:"💉", row:1, static:true, phone:"", dynamicPhone:"_anes", note:"Look up on EHConnect", link:"https://ehconnect.eushc.org/", linkLabel:"Open EHConnect" },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:2, static:true, phone:"", tieLines:[{shortcut:"1-XXXX", prefix:"404501", display:"404-501-XXXX"}] },
     { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-501-8000"}] },
   ],
@@ -987,7 +986,7 @@ function MainApp() {
                 foot of the screen when the page is shorter than the viewport ── */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
               marginTop:"auto", paddingTop:"18px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              <span>v10.14.6</span>
+              <span>v10.14.7</span>
               <span>·</span>
               <span onClick={openScheduler}
                 style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
