@@ -809,25 +809,25 @@ function MainApp() {
       return (
       <div onClick={()=>handleSelectHospital(h.id)} style={{
         background:T.card, borderRadius:"12px",
-        padding:"12px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
+        padding:"9px 10px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
         transition:"all 0.15s", minWidth:0, overflow:"hidden", borderLeft:`4px solid ${h.color}`, position:"relative", zIndex:2,
       }}>
         {/* The circle carries the hospital name, so the space beside it holds
             who is on call instead of repeating the abbreviation. */}
-        <div style={{ display:"flex", alignItems:"center", gap:"9px" }}>
-          <div style={{ width:"44px", height:"44px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"9.5px":"13.5px" }}>{h.abbr}</span>
+        <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+          <div style={{ width:"36px", height:"36px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"8px":"11.5px" }}>{h.abbr}</span>
           </div>
           <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
             {att ? (
               /* No role labels — the attending reads first and heavier, the
                  resident second and lighter, which carries the same order. */
               <>
-                <div style={{ fontSize:"13.5px", fontWeight:600, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                <div style={{ fontSize:"12px", fontWeight:600, color:T.text, lineHeight:1.2, overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflowWrap:"anywhere" }}>
                   {att}
                 </div>
                 {res && (
-                  <div style={{ fontSize:"11.5px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                  <div style={{ fontSize:"10.5px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                     {res}
                   </div>
                 )}
@@ -836,7 +836,7 @@ function MainApp() {
               <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
             )}
           </div>
-          <div style={{ color:T.textMuted, fontSize:"18px", flexShrink:0 }}>›</div>
+          <div style={{ color:T.textMuted, fontSize:"16px", flexShrink:0 }}>›</div>
         </div>
       </div>
       );
