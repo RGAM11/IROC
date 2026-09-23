@@ -166,7 +166,7 @@ const HOSPITAL_ROLES = {
   ],
   2: [
     { key:"IR",               label:"IR",                  icon:"🩺", row:0, hideWeek:true },
-    { key:"NursingSupervisor",label:"Nursing Supervisor",  icon:"👩‍⚕️", row:1, static:true, phone:"470-382-0191", dynamicPhone:"_nursingSup", note:"Call this number to have the RN and techs called in. They will also provide the on-call anesthesiologist's number." },
+    { key:"NursingSupervisor",label:"Nursing Supervisor (RN, Techs, Anesthesia)",  icon:"👩‍⚕️", row:1, static:true, phone:"470-382-0191", dynamicPhone:"_nursingSup", note:"Call this number to have the RN and techs called in. They will also provide the on-call anesthesiologist's number." },
     { key:"TieLines", label:"Tie Line Dialer", icon:"📞", row:2, static:true, phone:"", tieLines:[{shortcut:"1-XXXX", prefix:"404501", display:"404-501-XXXX"}] },
     { key:"OtherPhones", label:"Other Numbers", icon:"📱", row:2, static:true, phone:"" , numbers:[{label:"Operator", phone:"404-501-8000"}] },
   ],
@@ -809,25 +809,25 @@ function MainApp() {
       return (
       <div onClick={()=>handleSelectHospital(h.id)} style={{
         background:T.card, borderRadius:"12px",
-        padding:"9px 10px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
+        padding:"12px", cursor:"pointer", border:`1px solid ${T.cardBorder}`, boxShadow: dk ? "0 1px 4px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.06)",
         transition:"all 0.15s", minWidth:0, overflow:"hidden", borderLeft:`4px solid ${h.color}`, position:"relative", zIndex:2,
       }}>
         {/* The circle carries the hospital name, so the space beside it holds
             who is on call instead of repeating the abbreviation. */}
-        <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-          <div style={{ width:"36px", height:"36px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"8px":"11.5px" }}>{h.abbr}</span>
+        <div style={{ display:"flex", alignItems:"center", gap:"9px" }}>
+          <div style={{ width:"44px", height:"44px", borderRadius:"50%", background:h.color, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <span style={{ color:"#fff", fontWeight:800, fontSize:h.abbr.length>4?"9.5px":"13.5px" }}>{h.abbr}</span>
           </div>
           <div style={{ flex:1, minWidth:0, overflow:"hidden" }}>
             {att ? (
               /* No role labels — the attending reads first and heavier, the
                  resident second and lighter, which carries the same order. */
               <>
-                <div style={{ fontSize:"12px", fontWeight:600, color:T.text, lineHeight:1.2, overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflowWrap:"anywhere" }}>
+                <div style={{ fontSize:"13.5px", fontWeight:600, color:T.text, lineHeight:1.2, overflow:"hidden", display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical" }}>
                   {att}
                 </div>
                 {res && (
-                  <div style={{ fontSize:"10.5px", color:T.roleText, marginTop:"2px", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                  <div style={{ fontSize:"11.5px", color:T.roleText, marginTop:"2px", lineHeight:1.2, overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical" }}>
                     {res}
                   </div>
                 )}
@@ -836,7 +836,7 @@ function MainApp() {
               <div style={{ color:T.text, fontWeight:700, fontSize:"15px" }}>{h.abbr}</div>
             )}
           </div>
-          <div style={{ color:T.textMuted, fontSize:"16px", flexShrink:0 }}>›</div>
+          <div style={{ color:T.textMuted, fontSize:"18px", flexShrink:0 }}>›</div>
         </div>
       </div>
       );
@@ -867,7 +867,7 @@ function MainApp() {
 
         <div style={{ position:"relative", zIndex:1, flex:1, display:"flex", flexDirection:"column" }}>
           <div style={{ paddingTop:"22px", textAlign:"center", position:"relative", zIndex:1 }}>
-            <div style={{ fontSize:"10px", letterSpacing:"2.5px", color:T.textMuted, fontWeight:700, textTransform:"uppercase", whiteSpace:"nowrap" }}>Interventional Radiology On-Call</div>
+            <div style={{ fontSize:"12px", letterSpacing:"4px", lineHeight:1.45, color:T.textMuted, fontWeight:700, textTransform:"uppercase", padding:"0 46px" }}>Interventional Radiology On‑Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
               <span style={{ color: dk ? "#4A85C0" : "#4A6FA0" }}>R</span>
@@ -986,7 +986,7 @@ function MainApp() {
                 foot of the screen when the page is shorter than the viewport ── */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
               marginTop:"auto", paddingTop:"18px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              <span>v10.14.8</span>
+              <span>v10.14.9</span>
               <span>·</span>
               <span onClick={openScheduler}
                 style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
