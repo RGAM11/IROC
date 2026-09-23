@@ -867,7 +867,7 @@ function MainApp() {
 
         <div style={{ position:"relative", zIndex:1, flex:1, display:"flex", flexDirection:"column" }}>
           <div style={{ paddingTop:"22px", textAlign:"center", position:"relative", zIndex:1 }}>
-            <div style={{ fontSize:"12px", letterSpacing:"4px", color:T.textMuted, fontWeight:700, textTransform:"uppercase" }}>Interventional Radiology On-Call</div>
+            <div style={{ fontSize:"10px", letterSpacing:"2.5px", color:T.textMuted, fontWeight:700, textTransform:"uppercase", whiteSpace:"nowrap" }}>Interventional Radiology On-Call</div>
             <div style={{ fontSize:"50px", fontWeight:900, letterSpacing:"3px", marginTop:"2px", lineHeight:"1" }}>
               <span style={{ color: dk ? "#6A9FD0" : "#7BA3C9" }}>I</span>
               <span style={{ color: dk ? "#4A85C0" : "#4A6FA0" }}>R</span>
@@ -986,7 +986,7 @@ function MainApp() {
                 foot of the screen when the page is shorter than the viewport ── */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
               marginTop:"auto", paddingTop:"18px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              <span>v10.14.7</span>
+              <span>v10.14.8</span>
               <span>·</span>
               <span onClick={openScheduler}
                 style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
