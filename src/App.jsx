@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import EditMode from "./Edit";
+import EditMode, { jsonp } from "./Edit";
 
 // ═══════════════════════════════════════════════════════════════
 // MAINTENANCE MODE
@@ -33,25 +33,18 @@ const checkDynamicMaint = (setDown) => {
   // Use cached value immediately if fresh
   if (cache.on && Date.now() - cache.ts < DYN_MAINT_TTL) { setDown(true); return; }
 
-  // JSONP fetch to bypass CORS — Apps Script must handle mode=get_maintenance
-  const cb = "irocMC" + Date.now();
-  const script = document.createElement("script");
-  const timer = setTimeout(() => {
-    try { delete window[cb]; } catch (e) {}
-    if (script.parentNode) script.parentNode.removeChild(script);
-  }, 10000);
-  window[cb] = (d) => {
-    clearTimeout(timer);
-    try { delete window[cb]; } catch (e) {}
-    if (script.parentNode) script.parentNode.removeChild(script);
+  // Same helper Edit Mode uses: cookie-less fetch first, JSONP fallback.
+  // Apps Script routinely takes 10-20s to answer, so there is no short
+  // give-up timer here — a late answer must still count.
+  jsonp(SUGGESTION_ENDPOINT, { mode: "get_maintenance" }).then((d) => {
     const on = !!(d && d.ok && d.maintenance);
     try { localStorage.setItem(DYN_MAINT_KEY, JSON.stringify({on, ts: Date.now()})); } catch (e) {}
     if (d && d.ok) setScriptVersion(Number(d.v) || 5);
     if (on) setDown(true);
-  };
-  script.onerror = () => { clearTimeout(timer); try { delete window[cb]; } catch (e) {} };
-  script.src = `${SUGGESTION_ENDPOINT}?mode=get_maintenance&callback=${cb}&_=${Date.now()}`;
-  document.body.appendChild(script);
+  }).catch(() => {
+    // slow or blocked: try again soon rather than waiting out the full interval
+    setTimeout(() => checkDynamicMaint(setDown), 20000);
+  });
 };
 
 // ── Which Apps Script is deployed ────────────────────────────────────────────
@@ -677,7 +670,10 @@ export default function App() {
     if (MAINTENANCE || down) return;
     checkDynamicMaint(setDown);
     const t = setInterval(() => checkDynamicMaint(setDown), DYN_MAINT_TTL);
-    return () => clearInterval(t);
+    // a backgrounded phone app pauses its timers; re-check the moment it returns
+    const onVis = () => { if (document.visibilityState === "visible") checkDynamicMaint(setDown); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", onVis); };
   }, []);
 
   if (down) return <MaintenanceScreen />;
@@ -986,7 +982,7 @@ function MainApp() {
                 foot of the screen when the page is shorter than the viewport ── */}
             <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"8px",
               marginTop:"auto", paddingTop:"18px", fontSize:"9px", color:T.textMuted, letterSpacing:"1px" }}>
-              <span>v10.14.9</span>
+              <span>v10.14.10</span>
               <span>·</span>
               <span onClick={openScheduler}
                 style={{ cursor:"pointer", color:T.textSub, borderBottom:`1px solid ${T.cardBorder}`, paddingBottom:"1px" }}>
