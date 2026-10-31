@@ -485,7 +485,7 @@ export default function EditMode({ endpoint, T, dk, onClose }) {
       color:"#fff", fontSize:"22px", fontWeight:700, cursor:"pointer", userSelect:"none",
       WebkitTapHighlightColor:"transparent" };
     return (
-      <div style={{ ...page, background:"#112240", overflow:"hidden", display:"flex",
+      <div style={{ ...page, background:"#112240", display:"flex",
         flexDirection:"column", alignItems:"center", justifyContent:"flex-start",
         padding:"0 24px", paddingTop:"max(6vh, 28px)", boxSizing:"border-box" }}>
         <div style={{ fontSize:"34px", marginBottom:"8px" }}>🔒</div>
